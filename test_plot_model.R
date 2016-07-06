@@ -96,7 +96,13 @@ sum_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7
 
 
 bb_sum <- sum_model(data = bb1_trans_clean_keep)
+bb_sum <- sum_model(data = bb1_trans_clean_keep, nutrient = "sugar")
+bb_sum <- sum_model(data = bb1_trans_clean_keep, nutrient = "carb")
+bb_sum <- sum_model(data = bb1_trans_clean_keep, nutrient = "fat")
 bb2_sum <- sum_model(data = bb2_trans_clean_keep)
+bb2_sum <- sum_model(data = bb2_trans_clean_keep, nutrient = "sugar")
+bb2_sum <- sum_model(data = bb2_trans_clean_keep, nutrient = "carb")
+bb2_sum <- sum_model(data = bb2_trans_clean_keep, nutrient = "fat")
 
 plot_model <- function(data, k_vals = as.character(-6:6)){
   coef <- data.frame(summary(data)$coefficients)
@@ -116,3 +122,10 @@ plot_model <- function(data, k_vals = as.character(-6:6)){
 
 plot_model(data = bb_sum)
 plot_model(data = bb2_sum)
+
+
+#load model from bb model
+load("D:/Duke Grad/2016 Summer/keep/bb_models/bb_1_matt_cal.RData")
+plot_model(data = bb_1_matt_cal)
+plot_model(data = bb_1_resid_cal)
+plot_model(data = bb_1_matt_fat)
