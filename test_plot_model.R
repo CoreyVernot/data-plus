@@ -1,4 +1,4 @@
-# plot model for beta blocker
+# plot model for beta blocker, TCA
 # add confidence interval
 library(ggplot2)
 library(dplyr)
@@ -99,10 +99,16 @@ bb_sum <- sum_model(data = bb1_trans_clean_keep)
 bb_sum <- sum_model(data = bb1_trans_clean_keep, nutrient = "sugar")
 bb_sum <- sum_model(data = bb1_trans_clean_keep, nutrient = "carb")
 bb_sum <- sum_model(data = bb1_trans_clean_keep, nutrient = "fat")
+
 bb2_sum <- sum_model(data = bb2_trans_clean_keep)
 bb2_sum <- sum_model(data = bb2_trans_clean_keep, nutrient = "sugar")
 bb2_sum <- sum_model(data = bb2_trans_clean_keep, nutrient = "carb")
 bb2_sum <- sum_model(data = bb2_trans_clean_keep, nutrient = "fat")
+
+TCA_sum <- sum_model(data = TCA_trans_clean_keep)
+TCA_sum <- sum_model(data = TCA_trans_clean_keep, nutrient = "sugar")
+TCA_sum <- sum_model(data = TCA_trans_clean_keep, nutrient = "carb")
+TCA_sum <- sum_model(data = TCA_trans_clean_keep, nutrient = "fat")
 
 plot_model <- function(data, k_vals = as.character(-6:6)){
   coef <- data.frame(summary(data)$coefficients)
@@ -122,6 +128,7 @@ plot_model <- function(data, k_vals = as.character(-6:6)){
 
 plot_model(data = bb_sum)
 plot_model(data = bb2_sum)
+plot_model(data = TCA_sum)
 
 
 #load model from bb model
