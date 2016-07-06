@@ -1,3 +1,4 @@
+#corey edit 5 (guan wun was here)
 #Corey edit 4
 #Corey edit 3
 #Corey edit 2
@@ -5,6 +6,7 @@
 #Nathianiel edit
 #Nathaniel edit 2
 #GuanWun edit
+#GuanWun edit 2
 data(mtcars)
 colnames(mtcars)
 
@@ -32,7 +34,8 @@ plot_model <- function(model, k_vals = as.character(-6:6)){
   ggplot(plot_table, aes(x= k , y= estimate)) + 
     geom_errorbar(aes(ymin=estimate-1.96*SE, ymax= estimate + 1.96*SE, colour = "error_bar"), width=.3) +
     geom_line() +
-    geom_point()
+    geom_point() +
+    geom_abline(yintercept = 0, slope = 0)
 }
 
 m_bmin = 20
@@ -41,12 +44,13 @@ m_zero = 16
 m_pos = 13
 m_bmax <- 15
 
+k_vals <- c(rep("bmin", 10 ), -12:12, rep("bmax", 10))
 means <- c(rep(m_bmin, 10), rep(m_neg, 12), m_zero, rep(m_pos, 12), rep(m_bmax, 10))
 d <- data.frame(k = k_vals, mean = means)
-data <- d[sample(1:nrow(d), 1000, replace = T), ]
+data <- d[sample(1:nrow(d), 2000, replace = T), ]
 data$sum_calories = rnorm(mean = data$mean, sd = 7, n = nrow(data))
 k.f <- factor(data$k)
 levels(k.f) <- c("0", -12:12, "bmin", "bmax")
 model <- lm(sum_calories ~ k.f, data = data)
 
-plot_mod(model = model)
+plot_model(model = model)
