@@ -105,11 +105,13 @@ plot_model <- function(data, k_vals = as.character(-6:6)){
   plot_table <- coef[ rownames(coef) %in% rownames, c(1,2)]
   plot_table$k_level <- rownames(plot_table)
   plot_table$k <- plot_table$k_level %>% gsub("k.f", "", .) %>% as.numeric()
+  value <- plot_table$estimate[plot_table$k == 0]
   ggplot(plot_table, aes(x= k , y= estimate)) + 
     geom_errorbar(aes(ymin=estimate-1.96*SE, ymax= estimate + 1.96*SE, colour = "error_bar"), width=.3) +
     geom_line() +
     geom_point() +
-    geom_hline(yintercept = 0)
+    geom_abline(intercept = value, slope = 0)
+    #geom_hline(yintercept = 0)
 }
 
 plot_model(data = bb_sum)
