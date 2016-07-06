@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 #corey edit 5 (guan wun was here)
-=======
-
->>>>>>> origin/master
 #Corey edit 4
 #Corey edit 3
 #Corey edit 2
