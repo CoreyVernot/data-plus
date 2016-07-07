@@ -132,7 +132,6 @@ plot_model(data = TCA_sum)
 
 
 #load model from bb model
-load("D:/Duke Grad/2016 Summer/keep/bb_models/bb_1_matt_cal.RData")
 plot_model(data = bb_1_matt_cal)
 plot_model(data = bb_1_resid_cal)
 plot_model(data = bb_1_matt_fat)
