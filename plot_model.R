@@ -24,7 +24,7 @@ k.f <- factor(data$k)
 model <- lm(sum_calories ~ k.f, data = data)
 
 
-plot_model <- function(model, k_vals = as.character(-6:6)){
+plot_model <- function(model, k_vals = as.character(-6:6), title = "na"){
   library(ggplot2)
   coef <- data.frame(summary(model)$coefficients)
   colnames(coef) <- c("estimate", "SE", "t_value", "p")
@@ -32,12 +32,14 @@ plot_model <- function(model, k_vals = as.character(-6:6)){
   plot_table <- coef[ rownames(coef) %in% rownames, c(1,2)]
   plot_table$k_level <- rownames(plot_table)
   plot_table$k <- plot_table$k_level %>% gsub("k.f", "", .) %>% as.numeric()
-  ggplot(plot_table, aes(x= k , y= estimate)) + 
+  g <- ggplot(plot_table, aes(x= k , y= estimate)) + 
     geom_errorbar(aes(ymin=estimate-1.96*SE, ymax= estimate + 1.96*SE, colour = "error_bar"), width=.3) +
     geom_line() +
     geom_point() +
-    geom_abline(intercept = 0, slope = 0)
+    geom_abline(yintercept = 0, slope = 0)
+  geom_abline(intercept = 0, slope = 0)
 }
+
 
 
 
