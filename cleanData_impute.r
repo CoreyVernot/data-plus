@@ -1,4 +1,55 @@
 library(dplyr)
+setwd("C:/Users/Nathaniel Brown/workspace/BECR/")
+
+#rx$panelid is now rx$new_id
+rx <- read.csv("rx_keep.csv")
+
+getNewIDs <- function(... , rx, static_panel = T, Medical_Condition = NA, new = T, only_first_rx = F, use_sample = F){
+  allBrands <- list(...)
+  #the drugs are vectors of brands that contain a certain drug of interest
+  #ID <- rx$panelid[rx$Rx_Brand %in% Drug1,]  #we'll want to return ID's (panel or HH?) of ppl who took this drug and are in a certain household size
+  panelIDs <- list()
+  
+  #cleaning brand names
+  rx1 <- rx
+  if(!is.na(Medical_Condition)){rx1 <- rx1[rx1$Medical_Condition %in% Medical_Condition, ]}
+  #eliminate all whitespace and non-character/number things
+  rx1$Rx_Brand_Print <- rx1$Rx_Brand
+  rx1$Rx_Brand <- tolower(rx1$Rx_Brand)
+  rx1$Rx_Brand <- gsub("[^[:alnum:]]", "", rx1$Rx_Brand)
+  allBrands <- lapply( allBrands, function(x){ tolower(gsub("[^[:alnum:]]", "", x))})
+  
+  for(i in 1:length(allBrands)){
+    brands <- allBrands[[i]]
+    expr <- paste("(", paste(brands, collapse = "|"), ")", sep = "")
+    index <- grep(expr, rx1$Rx_Brand)
+    Brands <- unique(rx1$Rx_Brand_Print[index])
+    ids <- unique(rx1$new_id[index])
+
+    if(only_first_rx){
+      k_table <- findK0(rx = rx, panelids = ids, brands = Brands)
+      j_table <- findJ0(rx = rx, panelids = ids, Medical_Condition = Medical_Condition, use_sample = use_sample)
+      J_K_table <- merge(j_table, k_table, by = "panelid", all.y = T)
+      J_K_table$j_zero_timeunit[is.na(J_K_table$j_zero_timeunit)] <- -100
+      use <- J_K_table$k_zero_timeunit <= J_K_table$j_zero_timeunit
+      ids <- J_K_table$panelid[use]
+    }
+    
+    if(new){
+      rx_new <- rx[rx$New_Refill_Sample == "New", ]
+      rx_new <- rx_new[rx_new$Rx_Brand %in% Brands, ]
+      ids_new <- unique(rx_new$new_id)
+      ids <- ids[ids %in% ids_new]
+    }
+    
+    panelIDs$IDs[[i]] <- ids
+    panelIDs$Brands[[i]] <- unique(as.vector((rx1$Rx_Brand_Print[index])))
+    cat("Drug brands in database matching drug set ",i,":", "\n",sep="")
+    cat(unique(as.vector((rx1$Rx_Brand_Print[index]))),"\n",sep="    ")
+    cat("n =",length(ids),"\n","\n")
+  }
+  return(panelIDs)
+}
 
 PanelID_time <- function(panelids){ #helper method: get IDs from getPanelIDs
   ids <- c()
@@ -84,42 +135,42 @@ cleanData_impute <- function(rx, panelids, Brands, after_first_rx = T){ #panelid
   return(rx_full)
 }
 
-num_zero <- rx_full %>% group_by(panelid) %>% summarize(per_zero = mean(taking == 0))
+#num_zero <- rx_full %>% group_by(panelid) %>% summarize(per_zero = mean(taking == 0))
 
-zero_rx4 <- rx_new4 %>% group_by(panelid) %>% summarize(per_zero = mean(percent == 0))
-length(unique(rx_new4$panelid))
+#zero_rx4 <- rx_new4 %>% group_by(panelid) %>% summarize(per_zero = mean(percent == 0))
+#length(unique(rx_new4$panelid))
 
-Panelids <- panelids
-panelids <- Panelids$IDs[[1]]
+#Panelids <- panelids
+#panelids <- Panelids$IDs[[1]]
 
 
 
 #graph for each individual
-rx_full2 <- rx_full[, c(1,3)]
-df <- melt(rx_full2, id.vars = 'taking', variable.name = 'panelid')
-ggplot(df, aes(taking, panelid))+geom_line()+facet_grid(panelid ~ .)
+#rx_full2 <- rx_full[, c(1,3)]
+#df <- melt(rx_full2, id.vars = 'taking', variable.name = 'panelid')
+#ggplot(df, aes(taking, panelid))+geom_line()+facet_grid(panelid ~ .)
 
-rx_samp <- rx[rx$panelid %in% panelids, ]
-id_range <- rx_samp %>% group_by(panelid) %>% summarize(max_week = max(Week), min_week = min(Week))
-id_range_met <- rx_samp[rx_samp$Rx_Brand %in% Brands, ]%>% group_by(panelid) %>% summarize(max_week = max(Week), min_week = min(Week))
+#rx_samp <- rx[rx$panelid %in% panelids, ]
+#id_range <- rx_samp %>% group_by(panelid) %>% summarize(max_week = max(Week), min_week = min(Week))
+#id_range_met <- rx_samp[rx_samp$Rx_Brand %in% Brands, ]%>% group_by(panelid) %>% summarize(max_week = max(Week), min_week = min(Week))
 
-id_range_comp <- merge(id_range, id_range_met, by = "panelid")
+#id_range_comp <- merge(id_range, id_range_met, by = "panelid")
 
-id_range2 <- merge(id_range, IRI_week, by.x = "min_week", by.y = "IRI.Week", all.x = T)
-colnames(id_range2)[colnames(id_range2) == "timeunit"] <- "min_tu"
-id_range3 <- merge(id_range2, IRI_week, by.x = "max_week", by.y = "IRI.Week", all.x = T)
-colnames(id_range3)[colnames(id_range3) == "timeunit"] <- "max_tu"
+#id_range2 <- merge(id_range, IRI_week, by.x = "min_week", by.y = "IRI.Week", all.x = T)
+#colnames(id_range2)[colnames(id_range2) == "timeunit"] <- "min_tu"
+#id_range3 <- merge(id_range2, IRI_week, by.x = "max_week", by.y = "IRI.Week", all.x = T)
+#colnames(id_range3)[colnames(id_range3) == "timeunit"] <- "max_tu"
 
-id_range_m <- id_range3[, colnames(id_range3) %in% c("panelid", "min_tu", "max_tu")]
-rx_full_m <- merge(rx_full, id_range_m)
-pdf("taking_by_person_bb.pdf", height = 450 )
-par(mfrow = c(300, 2))
-id_sample <- sample(panelids, size = 600)
-for(i in 1:600){
-  plot(taking ~ tu, data = rx_full[rx_full$panelid == id_sample[i], ])
-  abline(v = id_range3$max_tu[id_range3$panelid == id_sample[i]], col = "red" )
-  abline(v = id_range3$min_tu[id_range3$panelid == id_sample[i]], col = "blue" )
-  
-}
-dev.off()
+#id_range_m <- id_range3[, colnames(id_range3) %in% c("panelid", "min_tu", "max_tu")]
+#rx_full_m <- merge(rx_full, id_range_m)
+#pdf("taking_by_person_bb.pdf", height = 450 )
+#par(mfrow = c(300, 2))
+#id_sample <- sample(panelids, size = 600)
+#for(i in 1:600){
+#  plot(taking ~ tu, data = rx_full[rx_full$panelid == id_sample[i], ])
+#  abline(v = id_range3$max_tu[id_range3$panelid == id_sample[i]], col = "red" )
+#  abline(v = id_range3$min_tu[id_range3$panelid == id_sample[i]], col = "blue" )
+#  
+#}
+#dev.off()
 

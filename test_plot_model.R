@@ -122,7 +122,7 @@ plot_model <- function(data, k_vals = as.character(-6:6)){
     geom_errorbar(aes(ymin=estimate-1.96*SE, ymax= estimate + 1.96*SE, colour = "error_bar"), width=.3) +
     geom_line() +
     geom_point() +
-    geom_abline(intercept = value, slope = 0)
+    geom_abline(intercept = 0, slope = 0)
     #geom_hline(yintercept = 0)
 }
 
