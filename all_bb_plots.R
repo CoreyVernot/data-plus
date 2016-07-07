@@ -1,22 +1,19 @@
-setwd("C:/Users/Nathaniel Brown/workspace/BECR/bb_models")
+setwd("~/Desktop/Data+/Models/bb_models")
 
+load("bb_names.RData")
 
-load("bb_1_resid_fat.RData")
-plot_model(bb_1_resid_fat)
+pdf("bb_models_plot.pdf")
 
-
-
-
-pdf("taking_by_person_bb.pdf", height = 100 )
-par(mfrow = c(8, 2))
+par(mfrow = c(8,1))
 
 for( i in 1:length(names)){
   print(i)
   mod <- names[i]
   do <- paste("load('", mod, ".RData')" , sep="")
   eval(parse(text=do))
-  do <- paste( "plot_model(", mod, ")", sep = "")
+  do <- paste( "print(plot_model(", mod, ", title = '",mod,  "' ))", sep = "")
   eval(parse(text=do))
+  
   do <- paste("rm(",mod,")",sep="")
   eval(parse(text=do))
 }
@@ -24,6 +21,34 @@ for( i in 1:length(names)){
 dev.off()
 
 
+
+
+
+
+
+
+
+setwd("~/Desktop/Data+/Models/met_models")
+
+load("met_names.RData")
+
+pdf("met_models_plot.pdf")
+
+par(mfrow = c(8,1))
+
+for( i in 1:length(names)){
+  print(i)
+  mod <- names[i]
+  do <- paste("load('", mod, ".RData')" , sep="")
+  eval(parse(text=do))
+  do <- paste( "print(plot_model(", mod, ", title = '",mod,  "' ))", sep = "")
+  eval(parse(text=do))
+  
+  do <- paste("rm(",mod,")",sep="")
+  eval(parse(text=do))
+}
+
+dev.off()
 
 f <- function(x) {((x-1)^2) * exp(-(x^3/3-2*x^2/2+x))}
 F <- function(x) {integrate(f,0,x)$value}
