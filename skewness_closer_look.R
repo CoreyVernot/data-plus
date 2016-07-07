@@ -94,10 +94,10 @@ hist(TCA_trans_clean_id$kurtosis_calories, main = "TCA", xlab = "kurtosis_cal", 
 
 
 # distribution closer look: control1 and control2####
-hist(control_1_cl_id$skewness_fiber, main = "control1", xlab = "skew_cal", ylab = "count")
-hist(control_1_cl_id$kurtosis_fiber, main = "control1", xlab = "kurtosis_cal", ylab = "count")
-hist(control_2_cl_id$skewness_fiber, main = "control2", xlab = "skew_cal", ylab = "count")
-hist(control_2_cl_id$kurtosis_fiber, main = "control2", xlab = "kurtosis_cal", ylab = "count")
+hist(control_1_cl_id$skewness_calories, main = "control1", xlab = "skew_cal", ylab = "count")
+hist(control_1_cl_id$kurtosis_calories, main = "control1", xlab = "kurtosis_cal", ylab = "count")
+hist(control_2_cl_id$skewness_calories, main = "control2", xlab = "skew_cal", ylab = "count")
+hist(control_2_cl_id$kurtosis_calories, main = "control2", xlab = "kurtosis_cal", ylab = "count")
 
 #summary
 #control 1
