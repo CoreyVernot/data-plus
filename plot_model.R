@@ -7,6 +7,7 @@
 #Nathaniel edit 2
 #GuanWun edit
 #GuanWun edit 2
+#NATHANIEL FINALLY LEARNED HOW TO USE GITHUB (somewhat...)
 data(mtcars)
 colnames(mtcars)
 
@@ -35,10 +36,12 @@ plot_model <- function(model, k_vals = as.character(-6:6), title = "na"){
     geom_errorbar(aes(ymin=estimate-1.96*SE, ymax= estimate + 1.96*SE, colour = "error_bar"), width=.3) +
     geom_line() +
     geom_point() +
-    geom_abline(intercept = 0, slope = 0) +
-    ggtitle(title)
-  return(g)
+    geom_abline(yintercept = 0, slope = 0)
+  geom_abline(intercept = 0, slope = 0)
 }
+
+
+
 
 m_bmin = 20
 m_neg = 20
