@@ -50,12 +50,13 @@ make_rx_hist <- function(rx_id, brands, iri_week_dir = "/Users/corey/Desktop/Dat
 
 days_sure_taking <- function(rx, ids, brands, take_name = "taking"){
   
+  days_missing <- rx %>% group_by(new_id) %>% summarize()
   rx_brand <- rx[rx$Rx_Brand %in% brands, ]
   days_take_f <- data.frame(new_id = c(), day = c(), taking = c())
   for(i in 1:length(ids)){
     id <- ids[i]
     rx_id <- rx[rx$new_id == id, ]
-    rx_hist <- make_rx_hist(rx_id, brands)
+    rx_hist <- make_rx_hist(rx_id, brands = brands)
     days <- seq.Date(from = min(rx_hist$min_fill), to = max(rx_hist$max_fill), by = 1)
     gaps <- rx_hist %>% filter(min_fill > max_stop0)
     zero_days <- c()
