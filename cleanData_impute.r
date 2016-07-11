@@ -173,4 +173,91 @@ cleanData_impute <- function(rx, panelids, Brands, after_first_rx = T){ #panelid
 #  
 #}
 #dev.off()
+<<<<<<< HEAD
+
+cleanData_impute2 <- function(rx, panelids, Brands, after_first_rx = T){ #panelids are from getPanelids(which already specify brands)
+  IRI_week <- read.csv("IRI_week.csv")
+  IRI_week$Start.Date <- as.Date(IRI_week$Start.Date)
+  IRI_week$End.Date <- as.Date(IRI_week$End.Date)
+  rx_new <- rx[rx$panelid %in% panelids, ]
+  rx_new <- rx_new[rx_new$Rx_Brand %in% Brands, ]
+  if(mean(is.na(rx_new$RxDays)) != 0){ 
+    msg <- "Warning: NAs in RxDays, use imputed dataset instead"
+    simpleWarning(msg)
+  }
+  #rx_new <- rx_new[rx_new$New_Refill_Sample == "New", ]
+  rx_new2 <- merge(rx_new, IRI_week, by.x = "Week", by.y = "IRI.Week", all.x = T)
+  rx_new2 <- rx_new2[, c("panelid", "RxDays", "Week", "Start.Date", "timeunit")]
+  rx_new2$Start.Date <- as.Date(rx_new2$Start.Date)
+  rx_new2$RxDays <- as.numeric(rx_new2$RxDays)
+  rx_new2$EndRx <- rx_new2$Start.Date + rx_new2$RxDays
+  colnames(rx_new2)[colnames(rx_new2) == "Start.Date"] <- "StartRx"
+  colnames(rx_new2)[colnames(rx_new2) == "timeunit"] <- "StartTimeUnit"
+  rx_new2 <- rx_new2[, c(1,2,3,4,6,5)]
+  #remove NA automatically
+  #retrieve timeunit and time range for EndRx
+  temp <- merge(rx_new2, IRI_week)
+  rx_new3 <- subset(temp,  EndRx >= Start.Date & EndRx <= End.Date)
+  rx_new3 <- rx_new3[, c("panelid", "RxDays", "Week", "IRI.Week", "StartRx", "EndRx", "StartTimeUnit", "timeunit")]
+  colnames(rx_new3)[colnames(rx_new3) == "Week"] <- "StartWeek"
+  colnames(rx_new3)[colnames(rx_new3) == "IRI.Week"] <- "EndWeek"
+  colnames(rx_new3)[colnames(rx_new3) == "timeunit"] <- "EndTimeUnit"
+  #add rows based on the number of timeunits in RxDays
+  n <- rx_new3$EndTimeUnit - rx_new3$StartTimeUnit + 1
+  nrow = sum(n)
+  tu <- rep(NA, nrow)
+  
+  index <- 1
+  for(i in 1:nrow(rx_new3)){
+    for(j in 1:n[i]){
+      tu[index] <- rx_new3$StartTimeUnit[i] + j-1
+      index <- index + 1
+    }
+  }
+  rx_new3$TimeUnit <- rx_new3$EndTimeUnit - rx_new3$StartTimeUnit + 1
+  rx_new3 <- rx_new3[rep(row.names(rx_new3), rx_new3$TimeUnit), ]
+  rx_new4 <- cbind(rx_new3, tu)
+  
+  IRI_timeunit <- read.csv("IRI_timeunit.csv")
+  rx_new4 <- merge(rx_new4, IRI_timeunit, by.x = "tu", by.y = "timeunit", all.x = T)
+  rx_new4 <- rx_new4[, c(2,3,4,5,6,7,8,9,1,12,13)]
+  rx_new4$end <- as.Date(rx_new4$end)
+  rx_new4$start <- as.Date(rx_new4$start)
+  rx_new4$timeRange <- ifelse((rx_new4$StartRx <= rx_new4$end) & (rx_new4$StartRx >= rx_new4$start), rx_new4$end - rx_new4$StartRx + 1,
+                              ifelse((rx_new4$EndRx <= rx_new4$end) & (rx_new4$EndRx >= rx_new4$start), rx_new4$EndRx - rx_new4$start + 1, 28))
+  rx_new4$percentage <- rx_new4$timeRange / 28
+  #summary for the percentage taking of each prescription in individuals
+  rx_sum <- rx_new4 %>% group_by(panelid, tu) %>% summarize(taking = sum(percentage))
+  rx_sum$taking2 <- rx_sum$taking
+  for(i in 1:nrow(rx_sum)){
+    rx_sum$taking[i] <- min(rx_sum$taking[i], 1)
+  }
+  #hist(rx_sum$taking)
+  
+  #merge by panelids
+  
+  id_tu <- PanelID_time(panelids)
+  rx_full <- merge(rx_sum, id_tu, by = c("panelid", "tu"), all = T)
+  rx_full$taking[is.na(rx_full$taking)] <- 0
+  rx_full$taking2[is.na(rx_full$taking2)] <- 0
+  hist(rx_full$taking)
+  
+  if(after_first_rx){
+    rx_first <- rx_full %>% subset(taking > 0) %>% group_by(panelid) %>% summarize(first_tu = min(tu))
+    rx_full <- merge(rx_full, rx_first, by = "panelid")
+    rx_full <- rx_full[rx_full$first_tu >= rx_full$tu, ]
+  }
+  colnames(rx_full)[colnames(rx_full) == "tu"] <- "timeunit"
+  return(rx_full)
+}
+
+fxn <- function(x){
+  if(!is.numeric(x)){ 
+    msg <- "Warning: NAs in RxDays, use imputed dataset instead"
+    simpleWarning(msg)
+  }
+}
+#rx_new <- rx_new[rx_new$New_Refill_Sample == "New", ]
+=======
+>>>>>>> origin/master
 
