@@ -67,6 +67,7 @@ panelids <- getPanelIDs(D1,D2,D3, rx=rx, demo=demo)
 rm(B11,B12,B22,B21,D1,D2,D3,server)
 
 #source: www.diabetes.org/living-with-diabetes/treatment-and-care/medication/oral-medications/what-are-my-options.html?referrer=https://google.com/
+#http://www.webmd.com/diabetes/sulfonylureas-for-type-2-diabetes
 sulfonylureas <- c("Diabinese", "Glucotrol", "Micronase","Glynase", "Diabeta", "Amaryl")
 #associated with increased appetite/weight!!! (because it increases insulin production)
 #http://www.diabetesselfmanagement.com/diabetes-resources/definitions/sulfonylureas/
