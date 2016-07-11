@@ -95,3 +95,51 @@ getPanelIDs <- function(..., rx, demo, static_panel = T, HHSizes=1, Medical_Cond
   return(panelIDs)
 }
 
+getNewIDs <- function(... , rx, static_panel = T, Medical_Condition = NA, new = T, only_first_rx = F, use_sample = F){
+  allBrands <- list(...)
+  #the drugs are vectors of brands that contain a certain drug of interest
+  #ID <- rx$panelid[rx$Rx_Brand %in% Drug1,]  #we'll want to return ID's (panel or HH?) of ppl who took this drug and are in a certain household size
+  panelIDs <- list()
+  
+  #cleaning brand names
+  rx1 <- rx
+  if(!is.na(Medical_Condition)){rx1 <- rx1[rx1$Medical_Condition %in% Medical_Condition, ]}
+  #eliminate all whitespace and non-character/number things
+  rx1$Rx_Brand_Print <- rx1$Rx_Brand
+  rx1$Rx_Brand <- tolower(rx1$Rx_Brand)
+  rx1$Rx_Brand <- gsub("[^[:alnum:]]", "", rx1$Rx_Brand)
+  allBrands <- lapply( allBrands, function(x){ tolower(gsub("[^[:alnum:]]", "", x))})
+  
+  for(i in 1:length(allBrands)){
+    brands <- allBrands[[i]]
+    expr <- paste("(", paste(brands, collapse = "|"), ")", sep = "")
+    index <- grep(expr, rx1$Rx_Brand)
+    Brands <- unique(rx1$Rx_Brand_Print[index])
+    ids <- unique(rx1$new_id[index])
+    
+    if(only_first_rx){
+      k_table <- findK0(rx = rx, panelids = ids, brands = Brands)
+      j_table <- findJ0(rx = rx, panelids = ids, Medical_Condition = Medical_Condition, use_sample = use_sample)
+      J_K_table <- merge(j_table, k_table, by = "panelid", all.y = T)
+      J_K_table$j_zero_timeunit[is.na(J_K_table$j_zero_timeunit)] <- -100
+      use <- J_K_table$k_zero_timeunit <= J_K_table$j_zero_timeunit
+      ids <- J_K_table$panelid[use]
+    }
+    
+    if(new){
+      rx_new <- rx[rx$New_Refill_Sample == "New", ]
+      rx_new <- rx_new[rx_new$Rx_Brand %in% Brands, ]
+      ids_new <- unique(rx_new$new_id)
+      ids <- ids[ids %in% ids_new]
+    }
+    
+    panelIDs$IDs[[i]] <- ids
+    panelIDs$Brands[[i]] <- unique(as.vector((rx1$Rx_Brand_Print[index])))
+    cat("Drug brands in database matching drug set ",i,":", "\n",sep="")
+    cat(unique(as.vector((rx1$Rx_Brand_Print[index]))),"\n",sep="    ")
+    cat("n =",length(ids),"\n","\n")
+  }
+  return(panelIDs)
+}
+
+

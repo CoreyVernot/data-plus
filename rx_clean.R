@@ -1,6 +1,8 @@
 #Load Rx Data
 
-
+setwd("C:\Users\Nathaniel Brown\Documents\GitHub\data-plus\IRI_timeunit.csv")
+iri_week_dir <- getwd()
+rx <- read.csv("rx_keep.csv")
 
 
 make_rx_hist <- function(rx_id, brands, iri_week_dir = "/Users/corey/Desktop/Data+/data"){
