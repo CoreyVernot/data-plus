@@ -68,7 +68,9 @@ rm(B11,B12,B22,B21,D1,D2,D3,server)
 
 #source: www.diabetes.org/living-with-diabetes/treatment-and-care/medication/oral-medications/what-are-my-options.html?referrer=https://google.com/
 #http://www.webmd.com/diabetes/sulfonylureas-for-type-2-diabetes
-sulfonylureas <- c("Diabinese", "Glucotrol", "Micronase","Glynase", "Diabeta", "Amaryl")
+sulfonylureas <-  c("Diabinese", "Glucotrol", "Micronase","Glynase", "Diabeta",
+                    "Amaryl", "chlorpropamide", "glimepiride", "glipizide", "glyburide",
+                    "tolazamide", "tolbutamide")
 #associated with increased appetite/weight!!! (because it increases insulin production)
 #http://www.diabetesselfmanagement.com/diabetes-resources/definitions/sulfonylureas/
 #https://books.google.com/books?id=KhPSBQAAQBAJ&pg=PA357&lpg=PA357&dq=sulfonylureas+insulin+%22appetite%22&source=bl&ots=Ncb7ny2Q0X&sig=kqDw1osroR5dO8KP6GMOY-W4u6o&hl=en&sa=X&ved=0ahUKEwj2saXky-TNAhXC6iYKHUQcBwgQ6AEIKjAC#v=onepage&q=sulfonylureas%20insulin%20%22appetite%22&f=false
