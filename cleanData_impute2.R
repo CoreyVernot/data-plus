@@ -2,6 +2,8 @@
 library(dplyr)
 
 rx_keep <- read.csv("D:/Duke Grad/2016 Summer/keep/tables/Fake Identifiers/rx_keep.csv")
+IRI_week <- read.csv("D:/Duke Grad/2016 Summer/keep/IRI_week.csv")
+IRI_timeunit <- read.csv("D:/Duke Grad/2016 Summer/keep/IRI_timeunit.csv")
 
 brandMet <- c("Fortamet", "Glucophage", "Glumetza", "Riomet", "Obimet",
               "Dianben", "Diaformin", "Siofor", "Metfogamma", "Janumet",
