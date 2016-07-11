@@ -173,6 +173,7 @@ cleanData_impute <- function(rx, panelids, Brands, after_first_rx = T){ #panelid
 #  
 #}
 #dev.off()
+<<<<<<< HEAD
 
 cleanData_impute2 <- function(rx, panelids, Brands, after_first_rx = T){ #panelids are from getPanelids(which already specify brands)
   IRI_week <- read.csv("IRI_week.csv")
@@ -257,4 +258,6 @@ fxn <- function(x){
   }
 }
 #rx_new <- rx_new[rx_new$New_Refill_Sample == "New", ]
+=======
+>>>>>>> origin/master
 
