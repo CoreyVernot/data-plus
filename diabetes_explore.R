@@ -8,7 +8,7 @@ GLP <- getNewIDs(GLP_1_Receptor_Agonists, rx = rx_keep, HHSizes = c(1,2))
 #Drug brands in database matching drug set 1:
 #  BYETTA    
 #n = 22 
-Met <- getNewIDs(Metformin, rx = rx_keep, HHSizes = c(1,2))
+Met <- getNewIDs(Metformin, rx = rx_keep, new = F,  HHSizes = c(1,2))
 #Drug brands in database matching drug set 1:
 #  METFORMIN (ALL)    JANUMET    GLUCOPHAGE (ALL)    AVANDAMET    METFORMIN    GLUCOPHAGE    
 #n = 390 
@@ -28,7 +28,7 @@ Thia <- getNewIDs(Thiazolidinediones, rx = rx_keep, HHSizes = c(1,2))
 #Drug brands in database matching drug set 1:
 #  AVANDIA    ACTOS    
 #n = 100 
-Sulf <- getNewIDs(Sulfonylureas, rx = rx_keep, HHSizes = c(1,2))
+Sulf <- getNewIDs(Sulfonylureas, new = F,  rx = rx_keep, HHSizes = c(1,2))
 #Drug brands in database matching drug set 1:
 #  GLIPIZIDE (ALL)    GLYBURIDE    GLIMEPIRIDE    MICRONASE    GLUCOTROL XL    AMARYL    GLIPIZIDE    GLYNASE    DIABETA    
 #n = 226 
