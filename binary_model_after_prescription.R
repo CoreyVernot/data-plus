@@ -1,3 +1,6 @@
+met1 = combine_control_new(met1_trans_clean_keep, control_1_cl_keep)
+met2 = combine_control_new(met2_trans_clean_keep, control_2_cl_keep)
+
 binary_model_per <- function(data, calorie_cut_points = c(800, 7000), k_range =c(-12, 12), nutrient = "carb"){
   #trim the sample down to a reasonable range
   variable<- paste(nutrient, "per", "cal",  sep = "_")
@@ -27,7 +30,7 @@ binary_model_per <- function(data, calorie_cut_points = c(800, 7000), k_range =c
   return(lm)
 }
 
-binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-12,12),nutrient="calories"){
+binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-12,12),nutrient="calories", ref = "bmin"){
   #cut the sample to a reasonable range
   variable <- paste("sum", nutrient, sep = "_")
   total_cal <- calorie_cut_points*28
@@ -49,6 +52,7 @@ binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-12,1
   
   #run the model
   data_use$after.f = factor(data_use$after)
+  if(!is.na(ref)){data_use$after.f <- relevel(data_use$after.f, ref = ref)}
   data_use$new_id.f <- factor(data_use$new_id)
   data_use$timeunit.f <- factor(data_use$timeunit)
   model <- paste("lm <- lm(log(", variable, "+ .1) ~ after.f + new_id.f + timeunit.f , data = data_use)", sep = "")
