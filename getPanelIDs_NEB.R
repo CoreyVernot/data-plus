@@ -103,7 +103,8 @@ dpp_4_inhibitors <- c("Januvia","Onglyza","Tradjenta","Nesina")
 #http://care.diabetesjournals.org/content/34/Supplement_2/S276
 
 
-sglt_2_inhibitors <- c("SGLT2","Invokana","Farxiga")
+sglt_2_inhibitors <- c("SGLT2","Invokana","Farxiga","Jardiance",
+                       "canaglifozin","dapaglifozin","empaglifozin")
 #weight loss?
 #http://care.diabetesjournals.org/content/38/3/352
 
@@ -120,15 +121,38 @@ oral_combination_therapy <- NA
 #Why did I even include this one?
 
 
-insulin <- NA 
+insulin <- c("Glulisine" ,"(Apidra)",
+                        "Detemir" ,"(Levemir)",
+                        "Glargine", "(Lantus)",
+                        "Aspart", "(Novolog)",
+                        "Lispro", "(Humalog)",
+                        "Humulin",
+                        "Novolin",
+                        "Regular Insulin",
+                        "NPH",
+                        "Ultralente" ,
+                        "U-500 concentrate",
+                        "U-300 glargine" ,"(Toujeo)",
+                        "Degludec" ,"(Tresiba)",
+                        "U-200 Degludec", "(Tresiba)",
+                        "U-200 lispro", "(Humalog)",
+                        "Regular Insulin",
+                        "70/30 Insulin",
+                        "75/25 Insulin",
+                        "50/50 Insulin",
+                        "Inhaled insulin", "(Afrezza)")
 #not even a drug, but a therapy. It is associated with weight gain though, in case you were curious
 #http://www.nytimes.com/health/guides/disease/type-2-diabetes/medications.html
 
 
 
-Diabetes_IDs <- getPanelIDs(sulfonylureas, biguanides, meglitinides, thiazolidinediones,
-                           dpp4_inhibitors, sglt2_inhibitors, alpha_glucosidase_inhibitors,
-                           bile_acid_sequestrants, oral_combination_therapy,demo=demo,rx=rx)
+Diabetes_IDs_1 <- getNewIDs(sulfonylureas, biguanides, meglitinides, thiazolidinediones,
+                           dpp_4_inhibitors, sglt_2_inhibitors, alpha_glucosidase_inhibitors,
+                           bile_acid_sequestrants, oral_combination_therapy,insulin,rx=rx,HHSizes = 1)
+
+Diabetes_IDs_2 <- getNewIDs(sulfonylureas, biguanides, meglitinides, thiazolidinediones,
+                              dpp_4_inhibitors, sglt_2_inhibitors, alpha_glucosidase_inhibitors,
+                              bile_acid_sequestrants, oral_combination_therapy,insulin,rx=rx,HHSizes = 2)
 
 length(Diabetes_IDs[[1]][[1]])
 
