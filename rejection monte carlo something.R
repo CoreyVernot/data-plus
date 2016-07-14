@@ -190,11 +190,14 @@ simulate_new <- function(mod, nsim=1, seed=NULL, newdata, ...) {
   pred <- predict(mod, newdata = newdata)
   mod$fitted.values <- pred
   sim <- simulate(object=mod, nsim=nsim, seed=seed)
-  for(i in 1:length(sim)){
-    while(sim[i] < 0){
-      sim[i] <- simulate(object=mod, nsim=1, seed=seed+as.integer(sim[i]))
+  for(j in 1: length(sim)){
+    for(i in 1:length(sim)[[j]]){
+      while(sim[i, j] < 0){
+        sim[i,j] <- 0#simulate(object=mod, nsim=1, seed=seed+as.integer(sim[i]))
+      }
     }
   }
+  
   return(sim)
 }
 
