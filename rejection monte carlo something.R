@@ -1,4 +1,6 @@
 
+path <- "C:\\Users\\Nathaniel Brown\\Documents\\GitHub\\data-plus\\"
+setwd(path)
 
 #Rejection sampling illustration
 
@@ -38,7 +40,8 @@ avg_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium",
 }
 #tentative arbitrary bins by 10,000 calories per month
 
-bin_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium","sat_fat","protein","fiber","cholesterol","calories"),bin_lengths = rep(10000,length(nutrients))){ #nutrients and bin_lengths should correspond by index
+bin_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium","sat_fat","protein","fiber","cholesterol","calories"),
+                                  bin_lengths = c(500, 5000,    2000,   50000,   1000,     2000,     1000,   2000,         50000)){ #nutrients and bin_lengths should correspond by index
   control_avg <- avg_nutrients(control,nutrients)
   mean_cols <- c("new_id")
   for(col in names(control_avg)){
@@ -82,13 +85,88 @@ bin_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium",
   return(ret)
 }#end function
 
-#control_avg2 <- data.frame(control_avg[order(control_avg[["bin_calories"]]),])
-  
-  
-#determining good bins
+plot_by_bins <- function(control_avg_bin){
+  bins  <- names(control_avg_bin)[grepl("bin_", names(control_avg_bin))]
+  means <- names(control_avg_bin)[grepl("mean_",names(control_avg_bin))]
+  nutrients <- gsub("bin_","",bins)
+  for(each_bin in bins){
+    for(each_val in unique(control_avg_bin[[each_bin]])){
+      print(each_bin);print(each_val)
+      sub <- control_avg_bin[control_avg_bin$bin_calories == each_val,]
+      hist(sub[[each_bin]])
+      
+    }
+  }
+      
+      
+  #hist of nut within nut bin
+  #and
+  #scatterplot of mean_nut vs timeunit within nut bin
+}
+
+#### DON'T RUN THESE UNLESS ABSOLUTELY NECESSARY ####
+control <- read.csv("C:\\Users\\Nathaniel Brown\\workspace\\BECR\\control_1_cl_keep.csv")
 control_avg <- avg_nutrients(control)
+system.time(control_avg_bin <- bin_nutrients(control))
+#### DON'T ####
+
+test <- plot(control_avg$mean_sugar[control_avg$timeunit == 68] ~ control_avg$sum_sugar[control_avg$timeunit==68])
+par(mfrow=c(2,2))
+plot(test)
+par(mfrow=c(1,1))
+#determining good bin sizes
 par(mfrow=c(3,3))
 for(n in nutrients){
   m <- paste("mean","_",n,sep="")
   hist(control_avg[[m]],main=m)
 }
+#nutrients <- c("fat", "carb", "sugar","sodium","sat_fat","protein","fiber","cholesterol","calories")
+#bins      <- c(2e3/4, 0.5e5,  1e5/5,  2e5/4,   1000,     1e5/5,    1000,   1e5/5,        1e6/5    )
+#these are just the sizes of the bins that default histograms give us
+
+
+#### DIST OF AVG CALORIES ####
+hist(control_avg$mean_cal)
+d <- (density(control_avg$mean_cal))
+
+# mode of gamma = (shape -1)*scale --> mode = 50000 -> shape = 500, scale = 100?
+abline(v = 42000, col = "red")
+mode = 42000
+shape = 6
+scale = mode/(shape -1)
+x <- 0:300000
+
+plot(d)
+lines(dgamma(x, shape =  shape, scale = scale) ~ x, col = "blue")
+#official avg cal model is gamma(6,8400)
+
+#### DIST OF AVG SUGAR ####
+hist(control_avg$mean_sugar)
+d <- (density(control_avg$mean_sugar))
+
+mode <- 2700
+abline(v = mode, col = "red")
+shape = 4
+scale = mode/(shape -1)
+x <- 0:300000
+
+plot(d)
+lines(dgamma(x, shape =  shape, scale = scale) ~ x, col = "blue")
+#official sugar model is gamma(4, 900)
+
+#### DIST OF AVG CARBS ####
+hist(control_avg$mean_carb)
+d <- (density(control_avg$mean_carb))
+
+mode <- 5200
+abline(v = mode, col = "red")
+shape = 5
+scale = mode/(shape -1)
+x <- 0:300000
+
+plot(d)
+lines(dgamma(x, shape =  shape, scale = scale) ~ x, col = "blue")
+#official carb model is gamma(5,1040)
+
+
+save.image()
