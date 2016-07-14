@@ -12,10 +12,10 @@ pcalc = function(days_missed, a){
 
 numday = 
 missed = c(numday, numday, numday -1:5)
+
 pcalc(missed, a = 3)
 s = sum(c(1/21, 1/21, 1/20, 1/19, 1/18, 1/17, 1/16))
 (1/16)/s
-
 
 
 
