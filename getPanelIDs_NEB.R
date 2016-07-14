@@ -144,8 +144,7 @@ insulin <- c("Glulisine" ,"(Apidra)",
 #not even a drug, but a therapy. It is associated with weight gain though, in case you were curious
 #http://www.nytimes.com/health/guides/disease/type-2-diabetes/medications.html
 
-
-
+rx <- read.csv("C:\\Users\\Nathaniel Brown\\workspace\\BECR\\rx_keep.csv")
 Diabetes_IDs_1 <- getNewIDs(sulfonylureas, biguanides, meglitinides, thiazolidinediones,
                            dpp_4_inhibitors, sglt_2_inhibitors, alpha_glucosidase_inhibitors,
                            bile_acid_sequestrants, oral_combination_therapy,insulin,rx=rx,HHSizes = 1)

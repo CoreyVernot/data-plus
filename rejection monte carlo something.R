@@ -170,3 +170,71 @@ lines(dgamma(x, shape =  shape, scale = scale) ~ x, col = "blue")
 
 
 save.image()
+
+#model names are structured as "nutrition_timeunit"
+make_models <- function(control_avg, nutrients = c("calories","carb","sugar"), timeunits = 28:92){
+  model_list <- list()
+  for(n in nutrients){
+    for(t in timeunits){ #full timeunit range
+      sub <- control_avg[control_avg[["timeunit"]] == t, grepl(n,names(control_avg))]
+      name <- paste(n,"_",t,sep="")
+      string <- paste(name," <- lm(sum_",n, "~ mean_",n,", data = sub)",
+                      sep="")
+      model_list[[name]] <- eval(parse(text=string))
+    }
+  }
+  return(model_list)
+}
+
+simulate_new <- function(mod, nsim=1, seed=NULL, newdata, ...) {
+  pred <- predict(mod, newdata = newdata)
+  mod$fitted.values <- pred
+  sim <- simulate(object=mod, nsim=nsim, seed=seed)
+  for(i in 1:length(sim)){
+    while(sim[i] < 0){
+      sim[i] <- simulate(object=mod, nsim=1, seed=seed+as.integer(sim[i]))
+    }
+  }
+  return(sim)
+}
+
+mod_list <- make_models(control_avg)
+sim <- simulate_new(mod = mod_list[["calories_88"]],nsim=1000,seed=1126,newdata = data.frame(mean_calories = 5000))
+
+#is the goal here to make a new df of food purchasers given a certain mean???
+
+
+sim_df <- function(control_avg, nutrients, nutrient_means, timeunits, nsim=1, seed=NULL, newdata=NULL, ...){
+  fake_df <- data.frame(matrix(ncol=2+length(nutrients)*2)) #two extra columns for id and timeunit. *2 for sum and mean of each nutrient
+  colnames(fake_df) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
+  
+  #mod_list <- make_models(control_avg = control_avg, nutrients = nutrients, timeunits = timeunits)
+  for(i in 1:nsim){
+    mini_df <- data.frame(matrix(ncol=2+length(nutrients)*2,nrow = length(timeunits)))
+    colnames(mini_df) <- colnames(fake_df)
+    mini_df[["timeunit"]] <- timeunits
+    mini_df[["new_id"]] <- -i
+    for(j in 1:length(nutrients)){
+      n <- nutrients[j]
+      for(t in timeunits){ #full timeunit range
+        mod <- make_models(control_avg,n,t)[[1]]
+        name <- paste("mean_",n,sep="")
+        #nd <- data.frame()
+        sim <- simulate_new(mod = mod,newdata = data.frame(name = nutrient_means[j]),nsim=1,seed=seed)
+      }
+    }
+  fake_df <- rbind(fake_df,mini_df) #each mini_df is a person we are simulating
+  }
+  return(fake_df)
+}
+
+simsim <- sim_df(control_avg,nutrients,nutrient_means,timeunits = 30:90, seed = 1126)
+
+#the way this function is set up is that it simulates n people with the SAME AVERAGES in different categories
+#they do not have unique averages like in the real data
+#that would require more complex input
+#we'll check it out later.
+#function is not yet complete
+
+hist(as.numeric(sim))
+nutrients
