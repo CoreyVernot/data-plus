@@ -12,10 +12,10 @@ pcalc = function(days_missed, a){
 
 numday = 
 missed = c(numday, numday, numday -1:5)
+
 pcalc(missed, a = 3)
 s = sum(c(1/21, 1/21, 1/20, 1/19, 1/18, 1/17, 1/16))
 (1/16)/s
-
 
 
 
@@ -27,3 +27,32 @@ e <- d %>% group_by(new_id) %>% summarize(missed = sum(missed))
 hist(e$missed[e$missed < 20])
 abline(v = mean(e$missed))
 abline(v = median(e$missed))
+
+
+
+# calculate the probability of actual taking in the study period####
+#condition 1:refill after the end of prescription
+start <- 1
+end <- 30
+refill <- 35
+ps <- 0.5 #the probability that the person misses the drug condition on having the drug at the time
+p <= 0 #the probability that the person has the supply at the time
+#timeunit 1:29
+pt = 1- ps #the probability that the person takes the drug at the time
+#timeunit 30
+pt = (1-ps)*p = (1-ps)*(1-dbinom(0, size = 29, prob = ps))
+#timeunit 31
+pt = (1-ps)*(1 - pbinom(1, size = 29, prob = ps) + dbinom(1, size = 29, prob = ps)*ps)
+#timeunit 32
+
+#timeunit 33
+
+#timeunit 34 (5 days after end date)
+pt = (1-ps)*(pbinom())
+
+
+#condition 2:refill before the end of prescription
+
+
+
+
