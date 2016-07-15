@@ -30,7 +30,9 @@ plot_model <- function(model, k_vals = as.character(-6:6), title = "na", mult = 
   rownames <- paste("k.f", k_vals, sep = "")
   plot_table <- coef[ rownames(coef) %in% rownames, c(1,2)]
   k_ref <- rownames[!rownames %in% rownames(plot_table)]
-  plot_table <- rbind(plot_table)
+  add <- data.frame(estimate = 0, SE = NA)
+  rownames(add) <- k_ref
+  plot_table <- rbind(plot_table, add)
   plot_table$k_level <- rownames(plot_table)
   plot_table$k <- plot_table$k_level %>% gsub("k.f", "", .) %>% as.numeric()
   g <- ggplot(plot_table, aes(x= k , y= estimate)) + 
