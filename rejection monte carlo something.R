@@ -208,7 +208,18 @@ sim <- simulate_new(mod = mod_list[["calories_88"]],nsim=1,seed=1126,newdata = d
 #to sim 
 
 
-sim_individual <- function(control_avg, nutrients, nutrient_means, timeunits, nsim=1, seed=NULL){
+sim_individual <- function(control_avg, nutrients, timeunits, nsim=1, seed=NULL){
+  #official avg cal model is gamma(6,8400)
+  #official avg sugar model is gamma(4, 900)
+  #official avg carb model is gamma(5,1040)
+  nutrient_means <- rep(NA,9)
+  names(nutrient_means) <- c("fat","carb","sugar","sodium","sat_fat","protein","fiber","cholesterol","calories")
+  
+  nutrient_means[["calories"]] <- rgamma(n=1,shape = 6,scale=8400)
+  nutrient_means[["sugar"]] <- rgamma(n=1,shape=4,scale=900)
+  nutrient_means[["carb"]] <- rgamma(n=1,shape=5,scale=1040)
+  
+  
   ret <- data.frame(matrix(ncol=2*length(nutrients)+2))
   names(ret) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
   
@@ -220,23 +231,23 @@ sim_individual <- function(control_avg, nutrients, nutrient_means, timeunits, ns
     for(i in 1:length(timeunits)){
       mod_name <- paste(n,"_",t,sep="")
       nd <- list()
-      nd[[mean_nutrient]] <- nutrient_means[j]
+      nd[[mean_nutrient]] <- nutrient_means[[n]] #newdata gets a random mean from a pre-specified distribution of means
       nd <- as.data.frame(nd)
       sum <- simulate_new(mod = mod_list[[mod_name]],nsim=1,newdata = nd)
       ret[i,j+2] <- sum #these are the predicted sum columns
     }
-    ret[[mean_nutrient]] <- nutrient_means[j]
+    ret[[mean_nutrient]] <- nutrient_means[[n]]
   }
   ret[["timeunit"]] <- timeunits
   return(ret)
 }
 
-sim_df <- function(control_avg, nutrients, nutrient_means, timeunits, num_indivs = 1, nsim=1, seed=NULL){
+sim_df <- function(control_avg, nutrients, timeunits, num_indivs = 1, nsim=1, seed=NULL){
   ret <- data.frame(matrix(ncol=2*length(nutrients)+2))
   names(ret) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
 
   for(i in 1:num_indivs){
-    rbind_me <- sim_individual(control_avg, nutrients, nutrient_means, timeunits, nsim, seed)
+    rbind_me <- sim_individual(control_avg, nutrients, timeunits, nsim, seed)
     rbind_me[["new_id"]] <- -i
     ret <- rbind(ret,rbind_me)
   }
@@ -244,7 +255,8 @@ sim_df <- function(control_avg, nutrients, nutrient_means, timeunits, num_indivs
   return(ret)
 }
 
-simsim <- sim_df(control_avg,nutrients,nutrient_means,timeunits = 30:90, seed = 1126)
+simsim <- sim_df(control_avg,nutrients,timeunits = 80:85, seed = 1126,num_indivs = 4)
+
 
 #the way this function is set up is that it simulates n people with the SAME AVERAGES in different categories
 #they do not have unique averages like in the real data
