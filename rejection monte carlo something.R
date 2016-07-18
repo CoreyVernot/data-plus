@@ -1,5 +1,6 @@
 
-path <- "C:\\Users\\Nathaniel Brown\\Documents\\GitHub\\data-plus\\"
+github <- "C:\\Users\\Nathaniel Brown\\Documents\\GitHub\\data-plus\\"
+box <- "C:\\Users\\Nathaniel Brown\\workspace\\BECR"
 setwd(path)
 
 #Rejection sampling illustration
@@ -237,15 +238,15 @@ sim <- simulate_new(mod = mod_list[["calories_88"]],nsim=1,seed=1126,newdata = d
 #to sim 
 
 
-sim_individual <- function(control_avg, nutrients, timeunits = 30:90, nsim=1, seed=NULL,Metformin = FALSE){
+sim_individual <- function(mods, nutrients, timeunits = 30:90, nsim=1, seed=NULL,Metformin = FALSE){
   #official avg cal model is gamma(6,8400)
   #official avg sugar model is gamma(4, 900)
   #official avg carb model is gamma(5,1040)
   nutrient_means <- rep(NA,9)
   names(nutrient_means) <- c("fat","carb","sugar","sodium","sat_fat","protein","fiber","cholesterol","calories")
   set.seed(seed)
-  nutrient_means[["sugar"]] <- rgamma(n=1,shape=4,scale=900)
-  nutrient_means[["carb"]] <- rgamma(n=1,shape=5,scale=1040)
+  #nutrient_means[["sugar"]] <- rgamma(n=1,shape=4,scale=900)
+  #nutrient_means[["carb"]] <- rgamma(n=1,shape=5,scale=1040)
   
   if(Metformin){nutrient_means[["calories"]] <- rgamma(n=1,shape = 6.5,scale=8363.636)
   }else{        nutrient_means[["calories"]] <- rgamma(n=1,shape = 6,scale=8400)}
@@ -254,7 +255,7 @@ sim_individual <- function(control_avg, nutrients, timeunits = 30:90, nsim=1, se
   names(ret) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
   
   
-  mods <- make_models(control_avg,nutrients,timeunits)
+  #system.time(mods <- make_models(control_avg,nutrients,timeunits))
   for(j in 1:length(nutrients)){
     n <- nutrients[j]
     mean_nutrient <- paste("mean_",n,sep="")
@@ -264,7 +265,7 @@ sim_individual <- function(control_avg, nutrients, timeunits = 30:90, nsim=1, se
       nd <- list()
       nd[[mean_nutrient]] <- nutrient_means[[n]] #newdata gets a random mean from a pre-specified distribution of means
       nd <- as.data.frame(nd)
-      sum <- simulate_new(mod = mod_list[[mod_name]],nsim=1,newdata = nd)
+      sum <- simulate_new(mod = mods[[mod_name]],nsim=1,newdata = nd)
       ret[i,j+2] <- sum #these are the predicted sum columns
     }
     ret[[mean_nutrient]] <- nutrient_means[[n]]
@@ -273,13 +274,14 @@ sim_individual <- function(control_avg, nutrients, timeunits = 30:90, nsim=1, se
   return(ret)
 }
 
-sim_df <- function(control_avg, nutrients, timeunits = 30:90, num_indivs = 1, nsim=1, seed=NULL){
+sim_df <- function(control_avg, nutrients, timeunits = 30:90, num_indivs = 1, nsim=1, seed=NULL, Metformin = FALSE){
   ret <- data.frame(matrix(ncol=2*length(nutrients)+2))
   names(ret) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
-
+  
+  mods <- make_models(control_avg,nutrients,timeunits)
   for(i in 1:num_indivs){
     seed <- seed + 1
-    rbind_me <- sim_individual(control_avg, nutrients, timeunits, nsim, seed)
+    rbind_me <- sim_individual(mods, nutrients, timeunits, nsim, seed)
     rbind_me[["new_id"]] <- -i
     ret <- rbind(ret,rbind_me)
   }
@@ -292,7 +294,7 @@ simsim <- sim_df(control_avg,nutrients,timeunits = 80:85, seed = 1126,num_indivs
 n_met <- length(unique(met$new_id))#number of individuals from metformin keep csv
 n_control <- length(unique(control$new_id))#number of individuals in total trans data
 
-sim_met     <- sim_df(met_avg,     nutrients = "calories", timeunits = 30:90, num_indivs = n_met,    seed = 1126)
+system.time(sim_met     <- sim_df(met_avg,     nutrients = "calories", timeunits = 30:90, num_indivs = n_met,    seed = 1126, Metformin=TRUE))
 system.time(sim_control <- sim_df(control_avg, nutrients = "calories", timeunits = 30:90, num_indivs = n_control,seed = 1126))
 
 length(unique(control_avg_met$new_id))
