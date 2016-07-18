@@ -40,7 +40,7 @@ plot_model <- function(model, k_vals = as.character(-6:6), title = "na", mult = 
   g <- ggplot(plot_table, aes(x= k , y= estimate)) + 
     geom_line() +
     geom_point() +
-    ggtitle(title)
+    ggtitle(title)+
     geom_abline(intercept = 0, slope = 0)
   if(use_group){
     g <- g +geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE, colour = group), width=.3)
