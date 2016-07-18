@@ -28,8 +28,8 @@ binary_model_per <- function(data, calorie_cut_points = c(800, 7000), k_range =c
   return(lm)
 }
 
-met1 = combine_control_new(met1_trans_clean_keep, control_1_cl_keep)
-met2 = combine_control_new(met2_trans_clean_keep, control_2_cl_keep)
+met1 = combine_control_new(met1_trans, ct1_trans)
+met2 = combine_control_new(met2_trans, ct2_trans)
 
 binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-6,6),nutrient="calories", ref = 0){
   library(dplyr)
@@ -67,7 +67,7 @@ binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-6,6)
   return(lm)
 }
 
-sum_model_new <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, 6), k_ref = "-1", tu_per_id = 10){
+sum_model_new <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-6, 6), k_ref = "-1"){
   variable <- paste("sum", nutrient, sep = "_")  # Create name of dependent variable in dataset
   total_cal <- calorie_cut_points*28             # Cut observations with too many or too few calories to be realistic
   data_use <- data[data$sum_calories <= total_cal[2] & data$sum_calories >= total_cal[1], ]
@@ -95,8 +95,7 @@ sum_model_new <- function(data, nutrient = "calories", calorie_cut_points = c(80
   return(lm)
 }
 
-multirange_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  
-                        k_range =c(-6, -2, 2, 6), time_ref = "-2"){
+multirange_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-6, -2, 2, 6), time_ref = "-1"){
   #cut the sample to a reasonable range
   variable <- paste("sum", nutrient, sep = "_")
   total_cal <- calorie_cut_points*28
@@ -133,8 +132,7 @@ multirange_model <- function(data, nutrient = "calories", calorie_cut_points = c
   return(lm)
 }
 
-middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  
-                             k_range =c(-2, 3), time_ref = "-1"){
+middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-2, 3), time_ref = "-1"){
   #cut the sample to a reasonable range
   variable <- paste("sum", nutrient, sep = "_")
   total_cal <- calorie_cut_points*28
@@ -168,8 +166,7 @@ middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800
   eval(parse(text = model))
   return(lm)
 }
-no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  
-                       k_range =c(-2, 3), time_ref = "-1"){
+no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000)){
   #cut the sample to a reasonable range
   variable <- paste("sum", nutrient, sep = "_")
   total_cal <- calorie_cut_points*28
@@ -177,18 +174,6 @@ no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 
   do <- paste("data_use <- data_use[data_use$", variable, "< mean(data_use$", variable, ") + 3*sd(data_use$", 
               variable, "), ]", sep = "")
   eval(parse(text = do))
-  
-  #convert k values to bmin and bmax out of k_range
-  kvals <- as.character(seq(k_range[1], k_range[2], 1)) #k values to keep as factors in the k_range
-  bmin <- (!data_use$k %in% kvals) & substr(data_use$k, 1, 1) == "-" #negative k values not in kvals are bmin
-  bmax <- (!data_use$k %in% kvals) & substr(data_use$k, 1, 1) %in% c("1", "2", "3", "4", "5", "6", "7", "8", "9") #positive k values not in range are bmax
-  data_use$k[bmin] <- "bmin"
-  data_use$k[bmax] <- "bmax"
-  
-  #assign variable for 5 time ranges
-  data_use$time <- ifelse(data_use$k %in% k_range[1]:k_range[2] & data_use$k != "control", 0, 
-                          ifelse(data_use$k == "bmax" & data_use$k != "control", 1, 
-                                 ifelse(data_use$k == "bmin" & data_use$k != "control",-1, "control")))
   
   #assign a new id to the control group
   control_ids <- data_use$new_id[data_use$k == "control"] %>% unique()
@@ -203,6 +188,40 @@ no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 
 }
 
 #model selection####
+met1_bi <- binary_model(met1)
+met1_sum <- sum_model_new(met1)
+met1_multi <- multirange_model(met1)
+#met1_mid <- middle_model(met1)
+met1_nok <- no_k_model(met1)
+
+#AIC(met1_bi, met1_sum, met1_multi, met1_nok)
+#            df      AIC
+#met1_bi    141 468805.3
+#met1_sum   152 468811.9
+#met1_multi 142 468802.8
+#met1_nok   138 468812.0
+
+#AICc(met1_bi, met1_sum, met1_multi, met1_nok)
+#            df     AICc
+#met1_bi    141 468805.4
+#met1_sum   152 468812.0
+#met1_multi 142 468802.9
+#met1_nok   138 468812.1
+
+#BIC(met1_bi, met1_sum, met1_multi, met1_nok)
+#            df      BIC
+#met1_bi    141 470341.0
+#met1_sum   152 470467.3
+#met1_multi 142 470349.3
+#met1_nok   138 470315.0
+
+met2_bi <- binary_model(met2)
+met2_sum <- sum_model_new(met2)
+met2_multi <- multirange_model(met2)
+#met2_mid <- middle_model(met2)
+met2_nok <- no_k_model(met2)
+
+#model selection_test####
 met1_c_binary <- binary_model(data=met1)
 met1_c_sum <- sum_model_new(data=met1)
 met1_c_multi <- multirange_model(data=met1)
@@ -260,7 +279,7 @@ lm_cal <- binary_model(TCA_trans_clean_keep) #significant within window and time
 
 
 ## plot model####
-plot_model <- function(model){
+plot_bi_model <- function(model, mult = 1.645){
   library(ggplot2)
   coef <- data.frame(summary(model)$coefficients)
   colnames(coef) <- c("estimate", "SE", "t_value", "p")
@@ -270,19 +289,31 @@ plot_model <- function(model){
   plot_table$time[plot_table$time == "(Intercept)"] <- -1
   plot_table$time[plot_table$time == "after.f1"] <- 1
   plot_table$time[plot_table$time == "after.fbmax"] <- 2
-  g1 <- ggplot(plot_table, aes(x= time , y= estimate)) + 
-    geom_errorbar(aes(ymin=estimate-1.96*SE, ymax= estimate + 1.96*SE, colour = "error_bar"), width=.3) +
+  g <- ggplot(plot_table, aes(x= time , y= estimate)) + 
+    geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE, colour = "error_bar"), width=.3) +
     geom_line() +
     geom_point() +
-    geom_abline(slope = 0)
-  
-  #plot_table <- coef[, c(1,2)]
-  #plot_table$timeunit_level <- rownames(plot_table)
-  #plot_table$timeunit <- plot_table$timeunit_level %>% gsub("timeunit.f", "", .) %>% as.numeric()
-  #plot_table <- plot_table[!is.na(plot_table$timeunit),]
-  #g2 <- ggplot(plot_table, aes(x= timeunit , y= estimate)) + 
-    #geom_errorbar(aes(ymin=estimate-1.96*SE, ymax= estimate + 1.96*SE, colour = "error_bar"), width=.3) +
-    #geom_line() +
-    #geom_point() +
-    #geom_abline(slope = 0)
+    geom_abline(intercept = 0, slope = 0)
+  return(g)
 }
+
+plot_sum_model <- function(model, k_vals = as.character(-6:6), mult = 1.645){
+  library(ggplot2)
+  coef <- data.frame(summary(model)$coefficients)
+  colnames(coef) <- c("estimate", "SE", "t_value", "p")
+  rownames <- paste("k.f", k_vals, sep = "")
+  plot_table <- coef[ rownames(coef) %in% rownames, c(1,2)]
+  k_ref <- rownames[!rownames %in% rownames(plot_table)]
+  add <- data.frame(estimate = 0, SE = NA)
+  rownames(add) <- k_ref
+  plot_table <- rbind(plot_table, add)
+  plot_table$k_level <- rownames(plot_table)
+  plot_table$k <- plot_table$k_level %>% gsub("k.f", "", .) %>% as.numeric()
+  g <- ggplot(plot_table, aes(x= k , y= estimate)) + 
+    geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE, colour = "error_bar"), width=.3) +
+    geom_line() +
+    geom_point() +
+    geom_abline(intercept = 0, slope = 0)
+  return(g)
+}
+
