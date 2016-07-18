@@ -23,7 +23,7 @@ for(n in nutrients){
 avg_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium","sat_fat","protein","fiber","cholesterol","calories")){
   control_avg <- data.frame(matrix(ncol=length(nutrients)))
   names(control_avg) <- nutrients
-
+  
   string <- "control_avg <- control %>% group_by(new_id) %>% summarize("
   for(i in 1:length(nutrients)){
     n = nutrients[i]
@@ -41,7 +41,7 @@ avg_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium",
 #tentative arbitrary bins by 10,000 calories per month
 
 bin_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium","sat_fat","protein","fiber","cholesterol","calories"),
-                                  bin_lengths = c(500, 5000,    2000,   50000,   1000,     2000,     1000,   2000,         50000)){ #nutrients and bin_lengths should correspond by index
+                          bin_lengths = c(500, 5000,    2000,   50000,   1000,     2000,     1000,   2000,         50000)){ #nutrients and bin_lengths should correspond by index
   control_avg <- avg_nutrients(control,nutrients)
   mean_cols <- c("new_id")
   for(col in names(control_avg)){
@@ -54,7 +54,7 @@ bin_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium",
   mean_cols <- mean_cols[mean_cols != "new_id"] 
   #take out id from the cols we're removing from control. The goal is to be mutually exclusive except for new_id for faster computations
   control_avg <- control_avg[, !names(control_avg) %in% c(mean_cols,"X","X.x","X.y")]
-
+  
   for(i in 1:length(nutrients)){
     bin_length <- bin_lengths[i]
     mean_nutrient <- paste("mean_",nutrients[i],sep="")
@@ -97,8 +97,8 @@ plot_by_bins <- function(control_avg_bin){
       
     }
   }
-      
-      
+  
+  
   #hist of nut within nut bin
   #and
   #scatterplot of mean_nut vs timeunit within nut bin
@@ -170,3 +170,99 @@ lines(dgamma(x, shape =  shape, scale = scale) ~ x, col = "blue")
 
 
 save.image()
+
+#model names are structured as "nutrition_timeunit"
+make_models <- function(control_avg, nutrients = c("calories","carb","sugar"), timeunits = 28:92){
+  model_list <- list()
+  for(n in nutrients){
+    for(t in timeunits){ #full timeunit range
+      sub <- control_avg[control_avg[["timeunit"]] == t, grepl(n,names(control_avg))]
+      name <- paste(n,"_",t,sep="")
+      string <- paste(name," <- lm(sum_",n, "~ mean_",n,", data = sub)",
+                      sep="")
+      model_list[[name]] <- eval(parse(text=string))
+    }
+  }
+  return(model_list)
+}
+
+simulate_new <- function(mod, nsim=1, seed=NULL, newdata, ...) {
+  pred <- predict(mod, newdata = newdata)
+  mod$fitted.values <- pred
+  sim <- simulate(object=mod, nsim=nsim, seed=seed)
+  for(j in 1: length(sim)){
+    for(i in 1:length(sim)[[j]]){
+      while(sim[i, j] < 0){
+        sim[i,j] <- 0#simulate(object=mod, nsim=1, seed=seed+as.integer(sim[i]))
+      }
+    }
+  }
+  
+  return(sim)
+}
+
+mod_list <- make_models(control_avg)
+sim <- simulate_new(mod = mod_list[["calories_88"]],nsim=1,seed=1126,newdata = data.frame(mean_calories = c(5000,431561,4213,632654,8493)))
+
+#is the goal here to make a new df of food purchasers given a certain mean???
+#to sim 
+
+
+sim_individual <- function(control_avg, nutrients, timeunits, nsim=1, seed=NULL){
+  #official avg cal model is gamma(6,8400)
+  #official avg sugar model is gamma(4, 900)
+  #official avg carb model is gamma(5,1040)
+  nutrient_means <- rep(NA,9)
+  names(nutrient_means) <- c("fat","carb","sugar","sodium","sat_fat","protein","fiber","cholesterol","calories")
+  
+  nutrient_means[["calories"]] <- rgamma(n=1,shape = 6,scale=8400)
+  nutrient_means[["sugar"]] <- rgamma(n=1,shape=4,scale=900)
+  nutrient_means[["carb"]] <- rgamma(n=1,shape=5,scale=1040)
+  
+  
+  ret <- data.frame(matrix(ncol=2*length(nutrients)+2))
+  names(ret) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
+  
+  
+  mods <- make_models(control_avg,nutrients,timeunits)
+  for(j in 1:length(nutrients)){
+    n <- nutrients[j]
+    mean_nutrient <- paste("mean_",n,sep="")
+    for(i in 1:length(timeunits)){
+      mod_name <- paste(n,"_",t,sep="")
+      nd <- list()
+      nd[[mean_nutrient]] <- nutrient_means[[n]] #newdata gets a random mean from a pre-specified distribution of means
+      nd <- as.data.frame(nd)
+      sum <- simulate_new(mod = mod_list[[mod_name]],nsim=1,newdata = nd)
+      ret[i,j+2] <- sum #these are the predicted sum columns
+    }
+    ret[[mean_nutrient]] <- nutrient_means[[n]]
+  }
+  ret[["timeunit"]] <- timeunits
+  return(ret)
+}
+
+sim_df <- function(control_avg, nutrients, timeunits, num_indivs = 1, nsim=1, seed=NULL){
+  ret <- data.frame(matrix(ncol=2*length(nutrients)+2))
+  names(ret) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
+
+  for(i in 1:num_indivs){
+    rbind_me <- sim_individual(control_avg, nutrients, timeunits, nsim, seed)
+    rbind_me[["new_id"]] <- -i
+    ret <- rbind(ret,rbind_me)
+  }
+  ret <- ret[-1,] #the first row is going to be a row of NA's always
+  return(ret)
+}
+
+simsim <- sim_df(control_avg,nutrients,timeunits = 80:85, seed = 1126,num_indivs = 4)
+
+
+#the way this function is set up is that it simulates n people with the SAME AVERAGES in different categories
+#they do not have unique averages like in the real data
+#that would require more complex input
+#we'll check it out later.
+#function is not yet complete
+
+hist(as.numeric(sim))
+nutrients
