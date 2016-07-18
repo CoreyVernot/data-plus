@@ -242,10 +242,9 @@ sum_resid_model_new <- function(data, nutrient = "carb", calorie_cut_points = c(
   return(lm)
 }
 
-
+# Demonstrating consistent decrease k values -1:3 #####
 met_1_matt_cal <- sum_model_new(met1, nutrient = "calories", k_range = c(-6, 6), k_ref = "-6")
 met_2_matt_cal <- sum_model_new(met2, nutrient = "calories", k_range = c(-6, 6), k_ref = "-6")
-
 
 mult <- 1.645
 plot_model(met_1_matt_cal, , title = "1 person")
@@ -264,6 +263,29 @@ p3 = plot_model(met_1_resid_carb, k_vals = as.character(-12:12), title = "1 pers
 p4 = plot_model(met_2_resid_carb, k_vals = as.character(-12:12), title = "2 person resid carb")
 
 multiplot(p1, p2, p3, p4, cols=2)
+
+
+p1 = plot_model(met_1_resid_cal, k_vals = as.character(-k:k) , title = "1 person resid", use_group = T)
+p2 = plot_model(met_2_resid_cal, title = "2 person resid", k_vals = as.character(-k:k), use_group = T)
+p3 = plot_model(met_1_resid_carb, k_vals = as.character(-k:k), title = "1 person resid carb", use_group = T)
+p4 = plot_model(met_2_resid_carb, k_vals = as.character(-k:k), title = "2 person resid carb", use_group = T)
+
+multiplot(p1, p2, p3, p4, cols=2)
+##### END #####
+
+
+
+met1_c_binary <- binary_model(data=met1)
+met1_c_sum <- sum_model_new(data=met1)
+met1_c_multi <- multirange_model(data=met1)
+AIC(met1_c_binary, met1_c_sum, met1_c_multi, met1_c_middle, met1_c_nok )
+met1_c_middle <- middle_model(data=met1)
+met1_c_nok <- no_k_model(data=met1)
+AIC(met1_c_middle, met1_c_nok)
+
+
+
+
 
 models$met_1_resid_sugar <- sum_resid_model(trans_met_1_cl_resid, nutrient = "sugar")
 models$met_1_resid_fat <- sum_resid_model(trans_met_1_cl_resid, nutrient = "fat")
