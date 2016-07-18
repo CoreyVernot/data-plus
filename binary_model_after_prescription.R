@@ -194,7 +194,7 @@ no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 
   return(lm)
 }
 
-#model selection####
+#model selection for k_range = c(-6,6)####
 a <- Sys.time()
 met1_bi <- binary_model(met1)
 met1_sum <- sum_model_new(met1)
@@ -203,6 +203,8 @@ met1_mid <- middle_model(met1)
 met1_nok <- no_k_model(met1)
 b <- Sys.time()
 a - b
+#Time difference of -2.002237 mins
+
 AIC(met1_bi, met1_sum, met1_multi, met1_nok)
 #            df      AIC
 #met1_bi    141 468805.3
@@ -238,11 +240,15 @@ anova(met1_nok, met1_mid)
 
 
 #met_2
+c <- Sys.time()
 met2_bi <- binary_model(met2)
 met2_sum <- sum_model_new(met2)
 met2_multi <- multirange_model(met2)
 met2_mid <- middle_model(met2)
 met2_nok <- no_k_model(met2)
+d <- Sys.time()
+c-d
+#Time difference of -16.14298 mins
 
 AIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
 #            df     AIC
@@ -270,7 +276,190 @@ anova(met2_nok, met2_mid, met2_bi)
 #2 729214 170713  2   0.79529 1.6986 0.1829
 #3 729213 170713  1  -0.20186  
 
+#model selection for k_range = c(-9,9)####
+a <- Sys.time()
+met1_bi <- binary_model(met1, k_range = c(-9,9))
+met1_sum <- sum_model_new(met1, k_range = c(-9,9))
+met1_multi <- multirange_model(met1, k_range = c(-9,-1,3,9))
+met1_mid <- middle_model(met1)
+met1_nok <- no_k_model(met1)
+b <- Sys.time()
+a - b
+#Time difference of -1.738998 mins
+AIC(met1_bi, met1_sum, met1_multi, met1_mid, met1_nok)
+#            df      AIC
+#met1_bi    141 468805.1
+#met1_sum   158 468819.2
+#met1_multi 142 468800.9
+#met1_mid   140 468800.6
+#met1_nok   138 468812.0
 
+BIC(met1_bi, met1_sum, met1_multi, met1_mid, met1_nok)
+#            df      BIC
+#met1_bi    141 470340.7
+#met1_sum   158 470540.0
+#met1_multi 142 470347.4
+#met1_mid   140 470325.4
+#met1_nok   138 470315.0
+
+anova(met1_nok, met1_mid)
+#Analysis of Variance Table
+#Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+#Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+#  Res.Df   RSS Df Sum of Sq      F    Pr(>F)    
+#1 396652 75667                                  
+#2 396650 75664  2    2.9355 7.6942 0.0004555 ***
+
+c <- Sys.time()
+met2_bi <- binary_model(met2, k_range = c(-9,9))
+met2_sum <- sum_model_new(met2, k_range = c(-9,9))
+met2_multi <- multirange_model(met2, k_range = c(-9, -1, 3, 9))
+met2_mid <- middle_model(met2, k_range = c(-1,3))
+met2_nok <- no_k_model(met2)
+d <- Sys.time()
+c-d
+#Time difference of -17.49178 mins
+AIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
+#            df     AIC
+#met2_bi    351 1011447
+#met2_sum   368 1011474
+#met2_multi 352 1011448
+#met2_mid   350 1011448
+#met2_nok   348 1011447
+
+BIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
+#            df     BIC
+#met2_bi    351 1015484
+#met2_sum   368 1015706
+#met2_multi 352 1015496
+#met2_mid   350 1015473
+#met2_nok   348 1015449
+
+anova(met2_nok, met2_bi)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
+# Res.Df    RSS Df Sum of Sq      F Pr(>F)
+# 1 729216 170714                           
+# 2 729213 170712  3    1.4077 2.0043  0.111
+
+anova(met2_nok, met2_mid)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+# Res.Df    RSS Df Sum of Sq      F Pr(>F)
+# 1 729216 170714                           
+# 2 729214 170713  2   0.79529 1.6986 0.1829
+
+anova(met2_nok, met2_multi)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+# Res.Df    RSS Df Sum of Sq     F Pr(>F)
+# 1 729216 170714                          
+# 2 729212 170712  4    1.7437 1.862  0.114
+
+#model selection for k_range = c(-12,12)####
+a <- Sys.time()
+met1_bi <- binary_model(met1, k_range = c(-12,12))
+met1_sum <- sum_model_new(met1, k_range = c(-12,12))
+met1_multi <- multirange_model(met1, k_range = c(-12, -1, 3, 12))
+met1_mid <- middle_model(met1, k_range = c(-1, 3))
+met1_nok <- no_k_model(met1)
+b <- Sys.time()
+a - b
+#Time difference of -1.741182 mins
+AIC(met1_bi, met1_sum, met1_multi, met1_mid, met1_nok)
+#            df      AIC
+#met1_bi    141 468805.9
+#met1_sum   164 468828.9
+#met1_multi 142 468803.9
+#met1_mid   140 468800.6
+#met1_nok   138 468812.0
+
+BIC(met1_bi, met1_sum, met1_multi, met1_mid, met1_nok)
+#            df      BIC
+#met1_bi    141 470341.5
+#met1_sum   164 470615.1
+#met1_multi 142 470350.4
+#met1_mid   140 470325.4
+#met1_nok   138 470315.0
+
+anova(met1_bi, met1_mid)
+#Analysis of Variance Table
+#Model 1: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
+#Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+#  Res.Df   RSS Df Sum of Sq F Pr(>F)
+#1 396649 75665                      
+#2 396650 75664 -1   0.61576 
+
+anova(met1_bi, met1_sum)
+#Analysis of Variance Table
+#Model 1: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
+#Model 2: log(sum_calories + 0.1) ~ k.f + new_id.f + timeunit.f
+#  Res.Df   RSS Df Sum of Sq      F Pr(>F)
+#1 396649 75665                           
+#2 396626 75661 23    4.3695 0.9959 0.4663
+
+
+c <- Sys.time()
+met2_bi <- binary_model(met2, k_range = c(-12,12))
+met2_sum <- sum_model_new(met2, k_range = c(-12,12))
+met2_multi <- multirange_model(met2, k_range = c(-12, -1, 3, 12))
+met2_mid <- middle_model(met2, k_range = c(-3,1))
+met2_nok <- no_k_model(met2)
+d <- Sys.time()
+c-d
+#Time difference of -17.13714 mins
+AIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
+# df     AIC
+# met2_bi    351 1011449
+# met2_sum   374 1011483
+# met2_multi 352 1011449
+# met2_mid   350 1011451
+# met2_nok   348 1011447
+BIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
+# df     BIC
+# met2_bi    351 1015486
+# met2_sum   374 1015784
+# met2_multi 352 1015497
+# met2_mid   350 1015476
+# met2_nok   348 1015449
+
+anova(met2_nok, met2_bi)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
+# Res.Df    RSS Df Sum of Sq      F Pr(>F)
+# 1 729216 170714                           
+# 2 729213 170713  3   0.98584 1.4037 0.2396
+anova(met2_nok, met2_sum)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ k.f + new_id.f + timeunit.f
+# Res.Df    RSS Df Sum of Sq      F Pr(>F)
+# 1 729216 170714                           
+# 2 729190 170710 26    3.8054 0.6252 0.9299
+anova(met2_nok, met2_multi)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+# Res.Df    RSS Df Sum of Sq      F Pr(>F)
+# 1 729216 170714                           
+# 2 729212 170712  4    1.4959 1.5975 0.1718
+anova(met2_nok, met2_mid)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+# Res.Df    RSS Df Sum of Sq      F Pr(>F)
+# 1 729216 170714                           
+# 2 729214 170714  2   0.16334 0.3489 0.7055
+
+#table for model selection####
+#       met1_bi   met1_sum   met1_multi   met1_mid   met1_nok
+# AIC
+# 
+# BIC
 
 #model selection_test####
 met1_c_binary <- binary_model(data=met1)
