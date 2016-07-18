@@ -1,4 +1,3 @@
-
 binary_model_per <- function(data, calorie_cut_points = c(800, 7000), k_range =c(-12, 12), nutrient = "carb"){
   #trim the sample down to a reasonable range
   variable<- paste(nutrient, "per", "cal",  sep = "_")
@@ -95,7 +94,7 @@ sum_model_new <- function(data, nutrient = "calories", calorie_cut_points = c(80
   return(lm)
 }
 
-multirange_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-6, -2, 2, 6), time_ref = "-1"){
+multirange_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-6, -1, 3, 6), time_ref = "-1"){
   #cut the sample to a reasonable range
   variable <- paste("sum", nutrient, sep = "_")
   total_cal <- calorie_cut_points*28
@@ -132,7 +131,7 @@ multirange_model <- function(data, nutrient = "calories", calorie_cut_points = c
   return(lm)
 }
 
-middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-2, 3), time_ref = "-1"){
+middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-1, 3), time_ref = "-1"){
   #cut the sample to a reasonable range
   variable <- paste("sum", nutrient, sep = "_")
   total_cal <- calorie_cut_points*28
@@ -166,6 +165,7 @@ middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800
   eval(parse(text = model))
   return(lm)
 }
+
 no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000)){
   #cut the sample to a reasonable range
   variable <- paste("sum", nutrient, sep = "_")
@@ -191,34 +191,48 @@ no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 
 met1_bi <- binary_model(met1)
 met1_sum <- sum_model_new(met1)
 met1_multi <- multirange_model(met1)
-#met1_mid <- middle_model(met1)
+met1_mid <- middle_model(met1)
 met1_nok <- no_k_model(met1)
 
-#AIC(met1_bi, met1_sum, met1_multi, met1_nok)
+AIC(met1_bi, met1_sum, met1_multi, met1_nok)
 #            df      AIC
 #met1_bi    141 468805.3
 #met1_sum   152 468811.9
-#met1_multi 142 468802.8
+#met1_multi 142 468800.2
+#met1_mid       468800.6
 #met1_nok   138 468812.0
 
-#AICc(met1_bi, met1_sum, met1_multi, met1_nok)
+AICc(met1_bi, met1_sum, met1_multi, met1_nok)
 #            df     AICc
 #met1_bi    141 468805.4
 #met1_sum   152 468812.0
-#met1_multi 142 468802.9
+#met1_multi 142 468800.3
 #met1_nok   138 468812.1
 
-#BIC(met1_bi, met1_sum, met1_multi, met1_nok)
+BIC(met1_bi, met1_sum, met1_multi, met1_nok)
 #            df      BIC
 #met1_bi    141 470341.0
 #met1_sum   152 470467.3
-#met1_multi 142 470349.3
+#met1_multi 142 470346.8
+#met1_mid       470325.4
 #met1_nok   138 470315.0
 
+
+anova(met1_nok, met1_mid)
+#Analysis of Variance Table
+#Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+#Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+#  Res.Df   RSS Df Sum of Sq      F    Pr(>F)    
+#1 396652 75667                                  
+#2 396650 75664  2    2.9355 7.6942 0.0004555 ***
+
+
+
+#met_2
 met2_bi <- binary_model(met2)
 met2_sum <- sum_model_new(met2)
 met2_multi <- multirange_model(met2)
-#met2_mid <- middle_model(met2)
+met2_mid <- middle_model(met2)
 met2_nok <- no_k_model(met2)
 
 #model selection_test####
@@ -278,7 +292,7 @@ lm_sugar_per <- binary_model_per(TCA_trans_clean_keep, nutrient = "sugar") #sign
 lm_cal <- binary_model(TCA_trans_clean_keep) #significant within window and time after window
 
 
-## plot model####
+#plot model####
 plot_bi_model <- function(model, mult = 1.645){
   library(ggplot2)
   coef <- data.frame(summary(model)$coefficients)
@@ -316,4 +330,3 @@ plot_sum_model <- function(model, k_vals = as.character(-6:6), mult = 1.645){
     geom_abline(intercept = 0, slope = 0)
   return(g)
 }
-
