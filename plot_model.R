@@ -23,7 +23,7 @@ k.f <- factor(data$k)
 model <- lm(sum_calories ~ k.f, data = data)
 
 
-plot_model <- function(model, k_vals = as.character(-6:6), title = "na", mult = 1.645){
+plot_model <- function(model, k_vals = as.character(-6:6), title = "na", mult = 1.645, use_group = F, group = as.character(-1:3)){
   library(ggplot2)
   coef <- data.frame(summary(model)$coefficients)
   colnames(coef) <- c("estimate", "SE", "t_value", "p")
@@ -35,14 +35,19 @@ plot_model <- function(model, k_vals = as.character(-6:6), title = "na", mult = 
   plot_table <- rbind(plot_table, add)
   plot_table$k_level <- rownames(plot_table)
   plot_table$k <- plot_table$k_level %>% gsub("k.f", "", .) %>% as.numeric()
+  group_names <- paste("k.f", group, sep = "")
+  plot_table$group <- plot_table$k_level %in% group_names
   g <- ggplot(plot_table, aes(x= k , y= estimate)) + 
-    geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE, colour = "error_bar"), width=.3) +
     geom_line() +
     geom_point() +
+    ggtitle(title)
     geom_abline(intercept = 0, slope = 0)
+  if(use_group){
+    g <- g +geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE, colour = group), width=.3)
+  }else{ g <- g + geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE), width=.3)}+
+    
   return(g)
 }
-
 
 
 
