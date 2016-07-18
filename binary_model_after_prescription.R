@@ -385,7 +385,7 @@ BIC(met1_bi, met1_sum, met1_multi, met1_mid, met1_nok)
 #met1_mid   140 470325.4
 #met1_nok   138 470315.0
 
-anova(met1_bi, met1_mid)
+anova(met1_bi, met1_mid) #corey fix this!!
 #Analysis of Variance Table
 #Model 1: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
 #Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
@@ -393,7 +393,7 @@ anova(met1_bi, met1_mid)
 #1 396649 75665                      
 #2 396650 75664 -1   0.61576 
 
-anova(met1_bi, met1_sum)
+anova(met1_bi, met1_sum) #corey fix this!!
 #Analysis of Variance Table
 #Model 1: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
 #Model 2: log(sum_calories + 0.1) ~ k.f + new_id.f + timeunit.f
