@@ -27,6 +27,8 @@ binary_model_per <- function(data, calorie_cut_points = c(800, 7000), k_range =c
   return(lm)
 }
 
+ct1_trans <- read.csv("D:/Duke Grad/2016 Summer/keep/tables/Fake Identifiers/de_identified aggregated data/control_1_cl_keep.csv")
+met1_trans <- read.csv("D:/Duke Grad/2016 Summer/keep/tables/Fake Identifiers/de_identified aggregated data/met1_trans_clean_keep.csv")
 met1 = combine_control_new(met1_trans, ct1_trans)
 met2 = combine_control_new(met2_trans, ct2_trans)
 
@@ -61,7 +63,8 @@ binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-6,6)
   if(ref != 0){data_use$after.f <- relevel(data_use$after.f, ref = ref)}
   data_use$new_id.f <- factor(data_use$new_id)
   data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ after.f + new_id.f + timeunit.f , data = data_use)", sep = "")
+  model <- paste("lm <- lm(log(", variable, "+ .1) ~ after.f + new_id.f + timeunit.f , data = data_use,
+                  model = FALSE, qr = FALSE)", sep = "")
   eval(parse(text = model))
   return(lm)
 }
@@ -89,7 +92,8 @@ sum_model_new <- function(data, nutrient = "calories", calorie_cut_points = c(80
   if(!is.na(k_ref)){data_use$k.f <- relevel(data_use$k.f, ref = k_ref)}
   data_use$new_id.f <- factor(data_use$new_id)
   data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ k.f + new_id.f + timeunit.f , data = data_use)", sep = "")
+  model <- paste("lm <- lm(log(", variable, "+ .1) ~ k.f + new_id.f + timeunit.f , data = data_use,
+                  model = FALSE, qr = FALSE)", sep = "")
   eval(parse(text = model))
   return(lm)
 }
@@ -126,7 +130,8 @@ multirange_model <- function(data, nutrient = "calories", calorie_cut_points = c
   if(!is.na(time_ref)){data_use$time.f <- relevel(data_use$time.f, ref = time_ref)}
   data_use$new_id.f <- factor(data_use$new_id)
   data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ time.f + new_id.f + timeunit.f , data = data_use)", sep = "")
+  model <- paste("lm <- lm(log(", variable, "+ .1) ~ time.f + new_id.f + timeunit.f , data = data_use,
+                  model = FALSE, qr = FALSE)", sep = "")
   eval(parse(text = model))
   return(lm)
 }
@@ -161,7 +166,8 @@ middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800
   if(!is.na(time_ref)){data_use$time.f <- relevel(data_use$time.f, ref = time_ref)}
   data_use$new_id.f <- factor(data_use$new_id)
   data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ time.f + new_id.f + timeunit.f , data = data_use)", sep = "")
+  model <- paste("lm <- lm(log(", variable, "+ .1) ~ time.f + new_id.f + timeunit.f , data = data_use,
+                  model = FALSE, qr = FALSE)", sep = "")
   eval(parse(text = model))
   return(lm)
 }
@@ -182,18 +188,21 @@ no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 
   #run the model
   data_use$new_id.f <- factor(data_use$new_id)
   data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ new_id.f + timeunit.f , data = data_use)", sep = "")
+  model <- paste("lm <- lm(log(", variable, "+ .1) ~ new_id.f + timeunit.f , data = data_use,
+                  model = FALSE, qr = FALSE)", sep = "")
   eval(parse(text = model))
   return(lm)
 }
 
 #model selection####
+a <- Sys.time()
 met1_bi <- binary_model(met1)
 met1_sum <- sum_model_new(met1)
 met1_multi <- multirange_model(met1)
 met1_mid <- middle_model(met1)
 met1_nok <- no_k_model(met1)
-
+b <- Sys.time()
+a - b
 AIC(met1_bi, met1_sum, met1_multi, met1_nok)
 #            df      AIC
 #met1_bi    141 468805.3
@@ -234,6 +243,34 @@ met2_sum <- sum_model_new(met2)
 met2_multi <- multirange_model(met2)
 met2_mid <- middle_model(met2)
 met2_nok <- no_k_model(met2)
+
+AIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
+#            df     AIC
+#met2_bi    351 1011451
+#met2_sum   362 1011467
+#met2_multi 352 1011451
+#met2_mid   350 1011448
+#met2_nok   348 1011447
+
+BIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
+#            df     BIC
+#met2_bi    351 1015487
+#met2_sum   362 1015630
+#met2_multi 352 1015499
+#met2_mid   350 1015473
+#met2_nok   348 1015449
+
+anova(met2_nok, met2_mid, met2_bi)
+#Analysis of Variance Table
+#Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+#Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+#Model 3: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
+#  Res.Df    RSS Df Sum of Sq      F Pr(>F)
+#1 729216 170714                           
+#2 729214 170713  2   0.79529 1.6986 0.1829
+#3 729213 170713  1  -0.20186  
+
+
 
 #model selection_test####
 met1_c_binary <- binary_model(data=met1)
