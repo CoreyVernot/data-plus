@@ -1,7 +1,7 @@
 
 github <- "C:\\Users\\Nathaniel Brown\\Documents\\GitHub\\data-plus\\"
 box <- "C:\\Users\\Nathaniel Brown\\workspace\\BECR"
-setwd(path)
+
 
 #Rejection sampling illustration
 
@@ -280,7 +280,7 @@ sim_df <- function(control_avg, nutrients, timeunits = 30:90, num_indivs = 1, ns
   
   mods <- make_models(control_avg,nutrients,timeunits)
   for(i in 1:num_indivs){
-    seed <- seed + 1
+    if(!is.null(seed)){seed <- seed + 1}
     rbind_me <- sim_individual(mods, nutrients, timeunits, nsim, seed)
     rbind_me[["new_id"]] <- -i
     ret <- rbind(ret,rbind_me)
@@ -289,12 +289,12 @@ sim_df <- function(control_avg, nutrients, timeunits = 30:90, num_indivs = 1, ns
   return(ret)
 }
 
-simsim <- sim_df(control_avg,nutrients,timeunits = 80:85, seed = 1126,num_indivs = 4)
+simsim <- sim_df(control_avg,nutrients,timeunits = 80:85, num_indivs = 4)
 
 n_met <- length(unique(met$new_id))#number of individuals from metformin keep csv
 n_control <- length(unique(control$new_id))#number of individuals in total trans data
 
-system.time(sim_met     <- sim_df(met_avg,     nutrients = "calories", timeunits = 30:90, num_indivs = n_met,    seed = 1126, Metformin=TRUE))
+system.time(sim_met     <- sim_df(met_avg,     nutrients = "calories", timeunits = 30:90, num_indivs = n_met,     Metformin=TRUE))
 system.time(sim_control <- sim_df(control_avg, nutrients = "calories", timeunits = 30:90, num_indivs = n_control,seed = 1126))
 
 length(unique(control_avg_met$new_id))
