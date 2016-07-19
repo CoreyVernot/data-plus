@@ -242,7 +242,8 @@ plot_model(met_1_matt_cal, , title = "1 person")
 
 plot_model(met_2_matt_cal, title = "2 person")
 
-k <- 9
+#Nathaniel start here
+k <- 12
 met_1_resid_cal <- sum_resid_model_new(trans_met_1_cl_resid, nutrient = "calories", k_range = c(-6, 6), k_ref = "-6")
 met_2_resid_cal <- sum_resid_model_new(trans_met_2_cl_resid, nutrient = "calories", k_range = c(-k, k), k_ref = as.character(min(k_range)))
 met_1_resid_carb <- sum_resid_model_new(trans_met_1_cl_resid, nutrient = "carb", k_range = c(-k, k), k_ref = as.character(min(k_range)))
@@ -263,6 +264,7 @@ p4 = plot_model(met_2_resid_carb, k_vals = as.character(-k:k), title = "2 person
 
 multiplot(p1, p2, p3, p4, cols=2)
 ##### END #####
+# Nathaniel End Here #
 
 met_1_resid_cal <- sum_resid_model_new(trans_met_1_cl_resid, nutrient = "calories", k_range = c(-6, 6), k_ref = "-6")
 met1_bin_cal_res <- binary_model_resid(trans_met_1_cl_resid, nutrient = "calories", k_range = c(-6, 6), ref = "0")
