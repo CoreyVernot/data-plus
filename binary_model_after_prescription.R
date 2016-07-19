@@ -32,6 +32,7 @@ met1_trans <- read.csv("D:/Duke Grad/2016 Summer/keep/tables/Fake Identifiers/de
 met1 = combine_control_new(met1_trans, ct1_trans)
 met2 = combine_control_new(met2_trans, ct2_trans)
 
+#model####
 binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-6,6),nutrient="calories", ref = 0){
   library(dplyr)
   #cut the sample to a reasonable range
@@ -194,9 +195,8 @@ no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 
   return(lm)
 }
 
-<<<<<<< HEAD
-
-sum_resid_model_new <- function(data, nutrient = "carb", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, 6), k_ref = min(k_range), tu_per_id = 10){
+#residualized model####
+sum_resid_model_new <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, 6), k_ref = min(k_range), tu_per_id = 10){
   data <- data[!is.na(data$k_zero_timeunit), ] # eliminate drug takers that didn't start a new prescription
   
   if("control" %in% unique(data$k)){ cat("Warning: 'control' is level in k - you shouldn't use non-drug-users in residualized model")}
@@ -236,7 +236,7 @@ sum_resid_model_new <- function(data, nutrient = "carb", calorie_cut_points = c(
   return(lm)
 }
 
-binary_model_resid <- function(data, nutrient = "carb", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, 6), ref = "0", tu_per_id = 10){
+binary_model_resid <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, 6), ref = "0", tu_per_id = 10){
   library(dplyr)
   data <- data[!is.na(data$k_zero_timeunit), ] # eliminate drug takers that didn't start a new prescription
   
@@ -283,7 +283,7 @@ binary_model_resid <- function(data, nutrient = "carb", calorie_cut_points = c(8
   return(lm)
 }
 
-multirange_model_resid <- function(data, nutrient = "carb", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, -1, 3, 6), ref = "-2", tu_per_id = 10){
+multirange_model_resid <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, -1, 3, 6), ref = "-2", tu_per_id = 10){
   library(dplyr)
   data <- data[!is.na(data$k_zero_timeunit), ] # eliminate drug takers that didn't start a new prescription
   
@@ -332,7 +332,7 @@ multirange_model_resid <- function(data, nutrient = "carb", calorie_cut_points =
   return(lm)
 }
 
-middle_model_resid <- function(data, nutrient = "carb", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, -1, 3, 6), ref = "-1", tu_per_id = 10){
+middle_model_resid <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, -1, 3, 6), ref = "-1", tu_per_id = 10){
   library(dplyr)
   data <- data[!is.na(data$k_zero_timeunit), ] # eliminate drug takers that didn't start a new prescription
   
@@ -377,7 +377,7 @@ middle_model_resid <- function(data, nutrient = "carb", calorie_cut_points = c(8
   return(lm)
 }
 
-no_k_model_resid <- function(data, nutrient = "carb", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, -1, 3, 6), ref = "-1", tu_per_id = 10){
+no_k_model_resid <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), sdcut = 2,  k_range =c(-6, -1, 3, 6), ref = "-1", tu_per_id = 10){
   library(dplyr)
   data <- data[!is.na(data$k_zero_timeunit), ] # eliminate drug takers that didn't start a new prescription
   
@@ -422,136 +422,8 @@ no_k_model_resid <- function(data, nutrient = "carb", calorie_cut_points = c(800
   return(lm)
 }
 
-
-sum_model_new <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-6, 6), k_ref = "-1"){
-  variable <- paste("sum", nutrient, sep = "_")  # Create name of dependent variable in dataset
-  total_cal <- calorie_cut_points*28             # Cut observations with too many or too few calories to be realistic
-  data_use <- data[data$sum_calories <= total_cal[2] & data$sum_calories >= total_cal[1], ]
-  do <- paste("data_use <- data_use[data_use$", variable, "< mean(data_use$", variable, ") + 3*sd(data_use$", 
-              variable, "), ]", sep = "")
-  eval(parse(text = do))
-  
-  #convert k values to bmin and bmax out of k_range
-  kvals <- as.character(seq(k_range[1], k_range[2], 1)) #k values to keep as factors in the k_range
-  bmin <- (!data_use$k %in% kvals) & substr(data_use$k, 1, 1) == "-" #negative k values not in kvals are bmin
-  bmax <- (!data_use$k %in% kvals) & substr(data_use$k, 1, 1) %in% c("1", "2", "3", "4", "5", "6", "7", "8", "9") #positive k values not in range are bmax
-  data_use$k[bmin] <- "bmin"
-  data_use$k[bmax] <- "bmax"
-  
-  
-  control_ids <- data_use$new_id[data_use$k == "control"] %>% unique()
-  data_use$new_id[data_use$new_id %in% control_ids] <- 0
-  
-  data_use$k.f <- factor(data_use$k)   #convert all k's, new_id's, and timeunits to factors
-  if(!is.na(k_ref)){data_use$k.f <- relevel(data_use$k.f, ref = k_ref)}
-  data_use$new_id.f <- factor(data_use$new_id)
-  data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ k.f + new_id.f + timeunit.f , data = data_use,
-                 model = FALSE, qr = FALSE)", sep = "")
-  eval(parse(text = model))
-  return(lm)
-}
-
-multirange_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-6, -1, 3, 6), time_ref = "-1"){
-  #cut the sample to a reasonable range
-  variable <- paste("sum", nutrient, sep = "_")
-  total_cal <- calorie_cut_points*28
-  data_use <- data[data$sum_calories <= total_cal[2] & data$sum_calories >= total_cal[1], ]
-  do <- paste("data_use <- data_use[data_use$", variable, "< mean(data_use$", variable, ") + 3*sd(data_use$", 
-              variable, "), ]", sep = "")
-  eval(parse(text = do))
-  
-  #convert k values to bmin and bmax out of k_range
-  kvals <- as.character(seq(k_range[1], k_range[4], 1)) #k values to keep as factors in the k_range
-  bmin <- (!data_use$k %in% kvals) & substr(data_use$k, 1, 1) == "-" #negative k values not in kvals are bmin
-  bmax <- (!data_use$k %in% kvals) & substr(data_use$k, 1, 1) %in% c("1", "2", "3", "4", "5", "6", "7", "8", "9") #positive k values not in range are bmax
-  data_use$k[bmin] <- "bmin"
-  data_use$k[bmax] <- "bmax"
-  
-  #assign variable for 5 time ranges
-  data_use$time <- ifelse(data_use$k %in% k_range[2]:k_range[3] & data_use$k != "control", 0, 
-                          ifelse(data_use$k %in% (k_range[3]+1):k_range[4] & data_use$k != "control", 1,
-                                 ifelse(data_use$k %in% k_range[1]:(k_range[2]-1) & data_use$k != "control", -1,
-                                        ifelse(data_use$k == "bmax" & data_use$k != "control", 2, 
-                                               ifelse(data_use$k == "bmin" & data_use$k != "control",-2, "control")))))
-  
-  #assign a new id to the control group
-  control_ids <- data_use$new_id[data_use$k == "control"] %>% unique()
-  data_use$new_id[data_use$new_id %in% control_ids] <- 0
-  
-  #run the model
-  data_use$time.f <- factor(data_use$time)
-  if(!is.na(time_ref)){data_use$time.f <- relevel(data_use$time.f, ref = time_ref)}
-  data_use$new_id.f <- factor(data_use$new_id)
-  data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ time.f + new_id.f + timeunit.f , data = data_use,
-                 model = FALSE, qr = FALSE)", sep = "")
-  eval(parse(text = model))
-  return(lm)
-}
-
-middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-1, 3), time_ref = "-1"){
-  #cut the sample to a reasonable range
-  variable <- paste("sum", nutrient, sep = "_")
-  total_cal <- calorie_cut_points*28
-  data_use <- data[data$sum_calories <= total_cal[2] & data$sum_calories >= total_cal[1], ]
-  do <- paste("data_use <- data_use[data_use$", variable, "< mean(data_use$", variable, ") + 3*sd(data_use$", 
-              variable, "), ]", sep = "")
-  eval(parse(text = do))
-  
-  #convert k values to bmin and bmax out of k_range
-  kvals <- as.character(seq(k_range[1], k_range[2], 1)) #k values to keep as factors in the k_range
-  bmin <- (!data_use$k %in% kvals) & substr(data_use$k, 1, 1) == "-" #negative k values not in kvals are bmin
-  bmax <- (!data_use$k %in% kvals) & substr(data_use$k, 1, 1) %in% c("1", "2", "3", "4", "5", "6", "7", "8", "9") #positive k values not in range are bmax
-  data_use$k[bmin] <- "bmin"
-  data_use$k[bmax] <- "bmax"
-  
-  #assign variable for 5 time ranges
-  data_use$time <- ifelse(data_use$k %in% k_range[1]:k_range[2] & data_use$k != "control", 0, 
-                          ifelse(data_use$k == "bmax" & data_use$k != "control", 1, 
-                                 ifelse(data_use$k == "bmin" & data_use$k != "control",-1, "control")))
-  
-  #assign a new id to the control group
-  control_ids <- data_use$new_id[data_use$k == "control"] %>% unique()
-  data_use$new_id[data_use$new_id %in% control_ids] <- 0
-  
-  #run the model
-  data_use$time.f <- factor(data_use$time)
-  if(!is.na(time_ref)){data_use$time.f <- relevel(data_use$time.f, ref = time_ref)}
-  data_use$new_id.f <- factor(data_use$new_id)
-  data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ time.f + new_id.f + timeunit.f , data = data_use,
-                 model = FALSE, qr = FALSE)", sep = "")
-  eval(parse(text = model))
-  return(lm)
-}
-
-no_k_model <- function(data, nutrient = "calories", calorie_cut_points = c(800, 7000)){
-  #cut the sample to a reasonable range
-  variable <- paste("sum", nutrient, sep = "_")
-  total_cal <- calorie_cut_points*28
-  data_use <- data[data$sum_calories <= total_cal[2] & data$sum_calories >= total_cal[1], ]
-  do <- paste("data_use <- data_use[data_use$", variable, "< mean(data_use$", variable, ") + 3*sd(data_use$", 
-              variable, "), ]", sep = "")
-  eval(parse(text = do))
-  
-  #assign a new id to the control group
-  control_ids <- data_use$new_id[data_use$k == "control"] %>% unique()
-  data_use$new_id[data_use$new_id %in% control_ids] <- 0
-  
-  #run the model
-  data_use$new_id.f <- factor(data_use$new_id)
-  data_use$timeunit.f <- factor(data_use$timeunit)
-  model <- paste("lm <- lm(log(", variable, "+ .1) ~ new_id.f + timeunit.f , data = data_use,
-                 model = FALSE, qr = FALSE)", sep = "")
-  eval(parse(text = model))
-  return(lm)
-}
-
 #model selection####
-=======
 #model selection for k_range = c(-6,6)####
->>>>>>> master
 a <- Sys.time()
 met1_bi <- binary_model(met1)
 met1_sum <- sum_model_new(met1)
@@ -743,6 +615,23 @@ BIC(met1_bi, met1_sum, met1_multi, met1_mid, met1_nok)
 #met1_mid   140 470325.4
 #met1_nok   138 470315.0
 
+<<<<<<< HEAD
+anova(met1_nok, met1_mid)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+# Res.Df   RSS Df Sum of Sq      F    Pr(>F)    
+# 1 396652 75667                                  
+# 2 396650 75664  2    2.9355 7.6942 0.0004555 ***
+
+anova(met1_nok, met1_sum)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ k.f + new_id.f + timeunit.f
+# Res.Df   RSS Df Sum of Sq      F Pr(>F)
+# 1 396652 75667                           
+# 2 396626 75661 26    6.6892 1.3487 0.1102
+=======
 anova(met1_nok, met1_mid) #corey fix this!!
 #Analysis of Variance Table
 #Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
@@ -760,7 +649,23 @@ anova(met1_nok, met1_sum) #corey fix this!!
 #Res.Df   RSS Df Sum of Sq      F Pr(>F)
 #1 396652 75667                           
 #2 396626 75661 26    6.6892 1.3487 0.1102
+>>>>>>> refs/remotes/origin/master
 
+anova(met1_nok, met1_bi)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
+# Res.Df   RSS Df Sum of Sq      F   Pr(>F)   
+# 1 396652 75667                                
+# 2 396649 75665  3    2.3197 4.0534 0.006854 **
+
+anova(met1_nok, met1_multi)
+# Analysis of Variance Table
+# Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
+# Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
+# Res.Df   RSS Df Sum of Sq      F   Pr(>F)   
+# 1 396652 75667                                
+# 2 396648 75664  4    3.0759 4.0311 0.002857 **
 
 c <- Sys.time()
 met2_bi <- binary_model(met2, k_range = c(-12,12))
@@ -772,14 +677,14 @@ d <- Sys.time()
 c-d
 #Time difference of -17.13714 mins
 AIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
-# df     AIC
+#             df     AIC
 # met2_bi    351 1011449
 # met2_sum   374 1011483
 # met2_multi 352 1011449
 # met2_mid   350 1011451
 # met2_nok   348 1011447
 BIC(met2_bi, met2_sum, met2_multi, met2_mid, met2_nok)
-# df     BIC
+#             df     BIC
 # met2_bi    351 1015486
 # met2_sum   374 1015784
 # met2_multi 352 1015497
@@ -814,12 +719,6 @@ anova(met2_nok, met2_mid)
 # Res.Df    RSS Df Sum of Sq      F Pr(>F)
 # 1 729216 170714                           
 # 2 729214 170714  2   0.16334 0.3489 0.7055
-
-#table for model selection####
-#       met1_bi   met1_sum   met1_multi   met1_mid   met1_nok
-# AIC
-# 
-# BIC
 
 #model selection_test####
 met1_c_binary <- binary_model(data=met1)
