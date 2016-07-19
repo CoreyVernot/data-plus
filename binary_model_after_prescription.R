@@ -168,7 +168,7 @@ middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800
   data_use$new_id.f <- factor(data_use$new_id)
   data_use$timeunit.f <- factor(data_use$timeunit)
   model <- paste("lm <- lm(log(", variable, "+ .1) ~ time.f + new_id.f + timeunit.f , data = data_use,
-                  model = FALSE, qr = FALSE)", sep = "")
+                  model = FALSE)", sep = "")
   eval(parse(text = model))
   return(lm)
 }
@@ -615,7 +615,7 @@ BIC(met1_bi, met1_sum, met1_multi, met1_mid, met1_nok)
 #met1_mid   140 470325.4
 #met1_nok   138 470315.0
 
-<<<<<<< HEAD
+
 anova(met1_nok, met1_mid)
 # Analysis of Variance Table
 # Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
@@ -631,8 +631,8 @@ anova(met1_nok, met1_sum)
 # Res.Df   RSS Df Sum of Sq      F Pr(>F)
 # 1 396652 75667                           
 # 2 396626 75661 26    6.6892 1.3487 0.1102
-=======
-anova(met1_nok, met1_mid) #corey fix this!!
+
+anova(met1_nok, met1_mid)
 #Analysis of Variance Table
 #Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
 #Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
@@ -640,16 +640,16 @@ anova(met1_nok, met1_mid) #corey fix this!!
 #1 396652 75667                                  
 #2 396650 75664  2    2.9355 7.6942 0.0004555 ***
 #  ---
-#  Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-anova(met1_nok, met1_sum) #corey fix this!!
+anova(met1_nok, met1_sum) 
 #Analysis of Variance Table
 #Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
 #Model 2: log(sum_calories + 0.1) ~ k.f + new_id.f + timeunit.f
 #Res.Df   RSS Df Sum of Sq      F Pr(>F)
 #1 396652 75667                           
 #2 396626 75661 26    6.6892 1.3487 0.1102
->>>>>>> refs/remotes/origin/master
+
 
 anova(met1_nok, met1_bi)
 # Analysis of Variance Table
