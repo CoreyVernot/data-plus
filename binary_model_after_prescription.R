@@ -594,6 +594,7 @@ anova(met1_nok, met1_mid)
 #1 396652 75667                                  
 #2 396650 75664  2    2.9355 7.6942 0.0004555 ***
 
+anova(met1_nok, met1_multi)
 
 
 #met_2
@@ -742,21 +743,23 @@ BIC(met1_bi, met1_sum, met1_multi, met1_mid, met1_nok)
 #met1_mid   140 470325.4
 #met1_nok   138 470315.0
 
-anova(met1_bi, met1_mid) #corey fix this!!
+anova(met1_nok, met1_mid) #corey fix this!!
 #Analysis of Variance Table
-#Model 1: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
+#Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
 #Model 2: log(sum_calories + 0.1) ~ time.f + new_id.f + timeunit.f
-#  Res.Df   RSS Df Sum of Sq F Pr(>F)
-#1 396649 75665                      
-#2 396650 75664 -1   0.61576 
+#Res.Df   RSS Df Sum of Sq      F    Pr(>F)    
+#1 396652 75667                                  
+#2 396650 75664  2    2.9355 7.6942 0.0004555 ***
+#  ---
+#  Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-anova(met1_bi, met1_sum) #corey fix this!!
+anova(met1_nok, met1_sum) #corey fix this!!
 #Analysis of Variance Table
-#Model 1: log(sum_calories + 0.1) ~ after.f + new_id.f + timeunit.f
+#Model 1: log(sum_calories + 0.1) ~ new_id.f + timeunit.f
 #Model 2: log(sum_calories + 0.1) ~ k.f + new_id.f + timeunit.f
-#  Res.Df   RSS Df Sum of Sq      F Pr(>F)
-#1 396649 75665                           
-#2 396626 75661 23    4.3695 0.9959 0.4663
+#Res.Df   RSS Df Sum of Sq      F Pr(>F)
+#1 396652 75667                           
+#2 396626 75661 26    6.6892 1.3487 0.1102
 
 
 c <- Sys.time()
