@@ -79,7 +79,7 @@ bin_nutrients <- function(control,nutrients = c("fat", "carb", "sugar","sodium",
     }
     
   }#end big for loop
-  print("done with big for loop!!!")
+  #print("done with big for loop!!!")
   
   ret <- merge(control_avg,sub,by=c("new_id"))
   return(ret)
@@ -125,9 +125,38 @@ for(n in nutrients){
 #these are just the sizes of the bins that default histograms give us
 
 
+
+
+
+
+#### DIST OF AVG CALORIES FOR MET USERS ####
+met <- read.csv("C:\\Users\\Nathaniel Brown\\workspace\\BECR\\met1_trans_clean_keep.csv")
+met_avg <- avg_nutrients(met,nutrients = "calories")
+rx <- read.csv("C:\\Users\\Nathaniel Brown\\workspace\\BECR\\rx_keep.csv")
+MetIDs <- getNewIDs(biguanides, rx=rx, HHSizes=1,new=F)
+control_met <- control[control$new_id %in% MetIDs[["IDs"]][[1]],]
+control_avg_met <- control_avg[control_avg$new_id %in% MetIDs[["IDs"]][[1]],]
+
+control_avg_met_uni <- control_met %>% group_by(new_id) %>% summarise(mean_cal = mean(sum_calories))
+
+d <- (density(control_avg_met_uni$mean_cal,bw=7000))
+plot(d)
+
+mode <- 46000
+abline(v = mode, col = "red")
+shape = 6.5
+scale = mode/(shape -1)
+x <- 0:300000
+
+lines(dgamma(x, shape =  shape, scale = scale) ~ x, col = "blue")
+lines(d)
+
+
 #### DIST OF AVG CALORIES ####
 hist(control_avg$mean_cal)
 d <- (density(control_avg$mean_cal))
+
+
 
 # mode of gamma = (shape -1)*scale --> mode = 50000 -> shape = 500, scale = 100?
 abline(v = 42000, col = "red")
@@ -208,17 +237,18 @@ sim <- simulate_new(mod = mod_list[["calories_88"]],nsim=1,seed=1126,newdata = d
 #to sim 
 
 
-sim_individual <- function(control_avg, nutrients, timeunits, nsim=1, seed=NULL){
+sim_individual <- function(control_avg, nutrients, timeunits = 30:90, nsim=1, seed=NULL,Metformin = FALSE){
   #official avg cal model is gamma(6,8400)
   #official avg sugar model is gamma(4, 900)
   #official avg carb model is gamma(5,1040)
   nutrient_means <- rep(NA,9)
   names(nutrient_means) <- c("fat","carb","sugar","sodium","sat_fat","protein","fiber","cholesterol","calories")
-  
-  nutrient_means[["calories"]] <- rgamma(n=1,shape = 6,scale=8400)
+  set.seed(seed)
   nutrient_means[["sugar"]] <- rgamma(n=1,shape=4,scale=900)
   nutrient_means[["carb"]] <- rgamma(n=1,shape=5,scale=1040)
   
+  if(Metformin){nutrient_means[["calories"]] <- rgamma(n=1,shape = 6.5,scale=8363.636)
+  }else{        nutrient_means[["calories"]] <- rgamma(n=1,shape = 6,scale=8400)}
   
   ret <- data.frame(matrix(ncol=2*length(nutrients)+2))
   names(ret) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
@@ -229,6 +259,7 @@ sim_individual <- function(control_avg, nutrients, timeunits, nsim=1, seed=NULL)
     n <- nutrients[j]
     mean_nutrient <- paste("mean_",n,sep="")
     for(i in 1:length(timeunits)){
+      t <- timeunits[i]
       mod_name <- paste(n,"_",t,sep="")
       nd <- list()
       nd[[mean_nutrient]] <- nutrient_means[[n]] #newdata gets a random mean from a pre-specified distribution of means
@@ -242,11 +273,12 @@ sim_individual <- function(control_avg, nutrients, timeunits, nsim=1, seed=NULL)
   return(ret)
 }
 
-sim_df <- function(control_avg, nutrients, timeunits, num_indivs = 1, nsim=1, seed=NULL){
+sim_df <- function(control_avg, nutrients, timeunits = 30:90, num_indivs = 1, nsim=1, seed=NULL){
   ret <- data.frame(matrix(ncol=2*length(nutrients)+2))
   names(ret) <- c("new_id","timeunit",paste("sum_",nutrients,sep=""),paste("mean_",nutrients,sep=""))
 
   for(i in 1:num_indivs){
+    seed <- seed + 1
     rbind_me <- sim_individual(control_avg, nutrients, timeunits, nsim, seed)
     rbind_me[["new_id"]] <- -i
     ret <- rbind(ret,rbind_me)
@@ -257,6 +289,17 @@ sim_df <- function(control_avg, nutrients, timeunits, num_indivs = 1, nsim=1, se
 
 simsim <- sim_df(control_avg,nutrients,timeunits = 80:85, seed = 1126,num_indivs = 4)
 
+n_met <- length(unique(met$new_id))#number of individuals from metformin keep csv
+n_control <- length(unique(control$new_id))#number of individuals in total trans data
+
+sim_met     <- sim_df(met_avg,     nutrients = "calories", timeunits = 30:90, num_indivs = n_met,    seed = 1126)
+system.time(sim_control <- sim_df(control_avg, nutrients = "calories", timeunits = 30:90, num_indivs = n_control,seed = 1126))
+
+length(unique(control_avg_met$new_id))
+length(unique(control_avg_met_uni$new_id))
+
+
+sim_cals <- sim_df(control_avg, nutrients = "calories",)
 
 #the way this function is set up is that it simulates n people with the SAME AVERAGES in different categories
 #they do not have unique averages like in the real data
