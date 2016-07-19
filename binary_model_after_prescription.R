@@ -168,7 +168,7 @@ middle_model <- function(data, nutrient = "calories", calorie_cut_points = c(800
   data_use$new_id.f <- factor(data_use$new_id)
   data_use$timeunit.f <- factor(data_use$timeunit)
   model <- paste("lm <- lm(log(", variable, "+ .1) ~ time.f + new_id.f + timeunit.f , data = data_use,
-                  model = FALSE, qr = FALSE)", sep = "")
+                  model = FALSE)", sep = "")
   eval(parse(text = model))
   return(lm)
 }
