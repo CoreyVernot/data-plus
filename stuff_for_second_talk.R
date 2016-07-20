@@ -14,7 +14,7 @@ panelids1 <- getNewIDs(brands, rx = rx, new = T, HHSizes = c(1))
 ids1 <- panelids1$IDs[[1]]
 Brands <- panelids1$Brands[[1]]
 panelids2 <- getNewIDs(brands, rx = rx, new = T, HHSizes = c(2))
-ids2 <- panelids$IDs[[1]]
+ids2 <- panelids2$IDs[[1]]
 
 control_1 <- read.csv("control_1_cl_keep.csv")
 control_2<- read.csv("control_2_cl_keep.csv")
