@@ -87,14 +87,15 @@ gibbs <- function(rx_m, id, a = 57, b = 3, iter= 100){
 gibbs4 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 1000, a = 54, b = 6)
 gibbs5 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 1000, a = 18, b = 2)
 gibbs3 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 1000, a = 1, b = 1)
-gibbs6 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 10000, a = 1, b = 1)
+gibbs6 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 1000, a = 1, b = 1)
 
 pt1 <- gibbs1$pt # a = 57, b = 3
 pt2 <- gibbs2$pt # a = 19, b = 1
 pt3 <- gibbs3$pt # a = 1, b = 1
 pt4 <- gibbs4$pt #a = 54, b = 6
 pt5 <- gibbs5$pt #a = 18, b = 2
-pt6 <- gibbs6$pt
+pt6 <- gibbs6$pt # a = 1, b = 1, iter = 10000
+
 take_f <- gibbs_ex$take_f
 a_n <- gibbs_ex
 plot(mean_take ~ day, data = take_f)
@@ -115,3 +116,10 @@ mean(pt3)
 plot(mean_take ~ day, data = gibbs1$take_f)
 plot(mean_take ~ day, data = gibbs2$take_f)
 plot(mean_take~ day, data = gibbs4$take_f)
+
+save(gibbs1,file =  "gibbs1.RData")
+save(gibbs2, file = "gibbs2.RData")
+save(gibbs3,file =  "gibbs3.RData")
+save(gibbs4,file =  "gibbs4.RData")
+save(gibbs5,file =  "gibbs5.RData")
+save(gibbs6, file =  "gibbs6.RData")
