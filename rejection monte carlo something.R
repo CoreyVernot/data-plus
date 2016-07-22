@@ -1,6 +1,6 @@
 
 github <- "C:\\Users\\Nathaniel Brown\\Documents\\GitHub\\data-plus\\"
-box <- "C:\\Users\\Nathaniel Brown\\workspace\\BECR"
+box <- "C:\\Users\\Nathaniel Brown\\workspace\\BECR\\"
 
 
 #Rejection sampling illustration
@@ -141,7 +141,7 @@ control_avg_met <- control_avg[control_avg$new_id %in% MetIDs[["IDs"]][[1]],]
 control_avg_met_uni <- control_met %>% group_by(new_id) %>% summarise(mean_cal = mean(sum_calories))
 
 d <- (density(control_avg_met_uni$mean_cal,bw=7000))
-plot(d)
+plot(d,main= "Density of Metformin Mean Calorie Consumption",xlab="Calories")
 
 mode <- 46000
 abline(v = mode, col = "red")
@@ -166,8 +166,10 @@ shape = 6
 scale = mode/(shape -1)
 x <- 0:300000
 
-plot(d)
+plot(d, main = "Density of Overall Mean Calorie Consumption",xlab = "Calories")
 lines(dgamma(x, shape =  shape, scale = scale) ~ x, col = "blue")
+legend(x=100000,y=2e-5,legend="gamma", border = "n")
+legend()
 #official avg cal model is gamma(6,8400)
 
 #### DIST OF AVG SUGAR ####
