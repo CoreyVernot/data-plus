@@ -44,7 +44,7 @@ plot_model <- function(model, k_vals = as.character(-6:6), title = "na", mult = 
     geom_abline(intercept = 0, slope = 0)
   if(use_group){
     g <- g +geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE, colour = group), width=.3)
-  }else{ g <- g + geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE), width=.3)}+
+  }else{ g <- g + geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE,colour = "orange"), width=.3)}+
     
   return(g)
 }

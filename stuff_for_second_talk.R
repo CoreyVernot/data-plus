@@ -14,7 +14,7 @@ panelids1 <- getNewIDs(brands, rx = rx, new = T, HHSizes = c(1))
 ids1 <- panelids1$IDs[[1]]
 Brands <- panelids1$Brands[[1]]
 panelids2 <- getNewIDs(brands, rx = rx, new = T, HHSizes = c(2))
-ids2 <- panelids$IDs[[1]]
+ids2 <- panelids2$IDs[[1]]
 
 control_1 <- read.csv("control_1_cl_keep.csv")
 control_2<- read.csv("control_2_cl_keep.csv")
@@ -28,8 +28,11 @@ met1 = combine_control_new(trans_met_1_cl, control_1)
 met2 = combine_control_new(trans_met_2_cl, control_2)
 
 model_dir <- "/Users/corey/Desktop/Data+/Models/met_models"
+model_dir <- paste(box,"\\random stuff\\",sep="")
 trans_met_1_cl_resid <- residualize_new(trans_met_1_cl, model_dir =  model_dir, nutrients = c("carb", "calories"))
 trans_met_2_cl_resid <- residualize_new(trans_met_2_cl, hhsize = 2, model_dir = model_dir, nutrients = c("carb", "calories"))
+#it says res_mod_2_carb.RData don't exist...
+
 
 binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-6,6),nutrient="calories", ref = 0){
   library(dplyr)
@@ -238,29 +241,31 @@ met_1_matt_cal <- sum_model_new(met1, nutrient = "calories", k_range = c(-6, 6),
 met_2_matt_cal <- sum_model_new(met2, nutrient = "calories", k_range = c(-6, 6), k_ref = "-6")
 
 mult <- 1.645
-plot_model(met_1_matt_cal, , title = "1 person")
+plot_model(met_1_matt_cal, title = "1 person")
 
 plot_model(met_2_matt_cal, title = "2 person")
 
 #Nathaniel start here
+trans_met_2_cl_resid
+trans_met_1_cl_resid <- read.csv()
 k <- 12
-met_1_resid_cal <- sum_resid_model_new(trans_met_1_cl_resid, nutrient = "calories", k_range = c(-6, 6), k_ref = "-6")
+met_1_resid_cal <- sum_resid_model_new(trans_met_1_cl_resid, nutrient = "calories", k_range = c(-k, k), k_ref = as.character(min(k_range)))
 met_2_resid_cal <- sum_resid_model_new(trans_met_2_cl_resid, nutrient = "calories", k_range = c(-k, k), k_ref = as.character(min(k_range)))
 met_1_resid_carb <- sum_resid_model_new(trans_met_1_cl_resid, nutrient = "carb", k_range = c(-k, k), k_ref = as.character(min(k_range)))
 met_2_resid_carb <- sum_resid_model_new(trans_met_2_cl_resid, nutrient = "carb", k_range = c(-k, k), k_ref = as.character(min(k_range)))
 
-p1 = plot_model(met_1_resid_cal, k_vals = as.character(-12:12) , title = "1 person resid")
-p2 = plot_model(met_2_resid_cal, title = "2 person resid", k_vals = as.character(-12:12))
-p3 = plot_model(met_1_resid_carb, k_vals = as.character(-12:12), title = "1 person resid carb")
-p4 = plot_model(met_2_resid_carb, k_vals = as.character(-12:12), title = "2 person resid carb")
+p1 = plot_model(met_1_resid_cal, k_vals = as.character(-k:k) , title = "Calorie Residualized Estimates\n(one-person households)")
+p2 = plot_model(met_2_resid_cal, title = "Calorie Residualized Estimates\n(two-person households)", k_vals = as.character(-12:12))
+p3 = plot_model(met_1_resid_carb, k_vals = as.character(-k:k), title = "Carb Residualized Estimates\n(one-person households)")
+p4 = plot_model(met_2_resid_carb, k_vals = as.character(-k:k), title = "Carb Residualized Estimates\n(two-person households)")
 
 multiplot(p1, p2, p3, p4, cols=2)
 
 
-p1 = plot_model(met_1_resid_cal, k_vals = as.character(-k:k) , title = "1 person resid", use_group = T)
-p2 = plot_model(met_2_resid_cal, title = "2 person resid", k_vals = as.character(-k:k), use_group = T)
-p3 = plot_model(met_1_resid_carb, k_vals = as.character(-k:k), title = "1 person resid carb", use_group = T)
-p4 = plot_model(met_2_resid_carb, k_vals = as.character(-k:k), title = "2 person resid carb", use_group = T)
+p1 = plot_model(met_1_resid_cal, k_vals = as.character(-k:k) , title = "Calorie Residualized Estimates\n(one-person households)", use_group = T)
+p2 = plot_model(met_2_resid_cal, title = "Calorie Residualized Estimates\n(two-person households)", k_vals = as.character(-k:k), use_group = T)
+p3 = plot_model(met_1_resid_carb, k_vals = as.character(-k:k), title = "Carb Residualized Estimates\n(one-person households)", use_group = T)
+p4 = plot_model(met_2_resid_carb, k_vals = as.character(-k:k), title = "Carb Residualized Estimates\n(two-person households)", use_group = T)
 
 multiplot(p1, p2, p3, p4, cols=2)
 ##### END #####
