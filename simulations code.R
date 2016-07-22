@@ -245,10 +245,11 @@ n_met <- 72 #met data frame is from met1_trans_clean_keep.csv
 setwd("/Users/corey/Desktop/Data+/data") #(Nathaniel, Guan-Wun, edit this line)
 met <- read.csv("met1_trans_clean_keep.csv")
 met_avg <- met %>% group_by(new_id) %>% summarise(mean_calories = mean(sum_calories))
+met_avg <- merge(met, met_avg, by = "new_id")
 mods <- make_models(met_avg, nutrients = "calories",timeunits = 30:90)
 sim_control <- read.csv("sim_control.csv") # Corey, Guan-wun, download this from google drive
 
-n <- 9 # Number of simulations
+n <- 1 # Number of simulations
 f_tests <- as.list(rep(NA, n))
 for(i in 1:n){
   sim_met <- sim_df(mods, nutrients = "calories", timeunits = 30:90, num_indivs = n_met,Metformin=TRUE)
@@ -261,11 +262,16 @@ for(i in 1:n){
   
   #combine simulated metformin data with simulated control data
   met1 = combine_control_new(sim_met, sim_control)
+  print("----> 1")
   bin_mod <- binary_model(met1)
+  print("----> 2")
   sum_mod <- sum_model_new(met1)
+  print("----> 3")
   multi_mod <- multirange_model(met1)
+  print("----> 4")
   mid_mod <- middle_model(met1)
   
+  print("-----> f_tests")
   fs <- list(ftest(bin_mod), ftest(sum_mod), ftest(multi_mod), ftest(mid_mod))
   f_tests[i] <- fs
   print(i)
