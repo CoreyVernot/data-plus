@@ -1,4 +1,14 @@
 # Run Simulations
+combine_control_new<- function(trans_cl, control_cl){
+  control_cl$k <- "control"
+  control_cl$k_zero_timeunit <- "control"
+  control_cl <- control_cl[! control_cl$new_id %in% trans_cl$new_id, ] # keep only control individuals that are not in our treatment group
+  trans_cl_m <- trans_cl[, colnames(trans_cl) %in% colnames(control_cl)]
+  control_cl <- control_cl[, colnames(control_cl) %in% colnames(trans_cl_m)]
+  Trans_cl <- rbind(trans_cl_m, control_cl)
+  return(Trans_cl)
+}
+
 #Run all code on this sheet, edit the working directory below (line 243)
 binary_model <- function(data, calorie_cut_points = c(800,7000), k_range=c(-6,6),nutrient="calories", ref = 0){
   library(dplyr)
@@ -249,7 +259,7 @@ met_avg <- merge(met, met_avg, by = "new_id")
 mods <- make_models(met_avg, nutrients = "calories",timeunits = 30:90)
 sim_control <- read.csv("sim_control.csv") # Corey, Guan-wun, download this from google drive
 
-n <- 1 # Number of simulations
+n <- 4 # Number of simulations
 f_tests <- as.list(rep(NA, n))
 for(i in 1:n){
   sim_met <- sim_df(mods, nutrients = "calories", timeunits = 30:90, num_indivs = n_met,Metformin=TRUE)
