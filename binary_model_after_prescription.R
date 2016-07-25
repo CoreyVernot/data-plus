@@ -815,3 +815,25 @@ plot_sum_model <- function(model, k_vals = as.character(-6:6), mult = 1.645){
     geom_abline(intercept = 0, slope = 0)
   return(g)
 }
+
+
+#plot middle model####
+plot_model <- function(model, time_vals = as.character(-1:1), title = "na", mult = 1.645, use_group = F, group = as.character(-1:3)){
+  library(ggplot2)
+  coef <- data.frame(summary(model)$coefficients)
+  colnames(coef) <- c("estimate", "SE", "t_value", "p")
+  rownames <- paste("time.f", time_vals, sep = "")
+  plot_table <- coef[ rownames(coef) %in% rownames, c(1,2)]
+
+  plot_table$time_level <- rownames(plot_table)
+  plot_table$time <- plot_table$time_level %>% gsub("time.f", "", .) %>% as.numeric()
+  
+  g <- ggplot(plot_table, aes(x= time , y= estimate)) + 
+    geom_line() +
+    geom_point() +
+    ggtitle(title)+
+    geom_abline(intercept = 0, slope = 0)
+  g <- g + geom_errorbar(aes(ymin=estimate-mult*SE, ymax= estimate + mult*SE), width=.3)
+    
+    return(g)
+}

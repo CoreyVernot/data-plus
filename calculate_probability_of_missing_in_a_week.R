@@ -36,7 +36,7 @@ start <- 1
 end <- 30
 refill <- 35
 ps <- 0.5 #the probability that the person misses the drug condition on having the drug at the time
-p <= 0 #the probability that the person has the supply at the time
+p <- 0 #the probability that the person has the supply at the time
 #timeunit 1:29
 pt = 1- ps #the probability that the person takes the drug at the time
 #timeunit 30
@@ -50,6 +50,20 @@ pt = (1-ps)*(1 - pbinom(1, size = 29, prob = ps) + dbinom(1, size = 29, prob = p
 #timeunit 34 (5 days after end date)
 pt = (1-ps)*(pbinom())
 
+
+
+
+L <- 29 #Rx Days
+R <- 34 #NUmber of days before the next refill
+ph <- function(j,L,ps){ #j = days after the end of prescription, ps = probability of missing the drug given having the prescription
+  i <- 0:(j-1)
+  sum_terms <- (dbinom(j-1-i, L, ps)*(1-pbinom(i, j - 1, ps)))
+  ph <- (1-pbinom(j-1, L, ps) + sum(sum_terms))
+  return(ph)
+}
+
+
+ph(5, 29, .05)
 
 #condition 2:refill before the end of prescription
 
