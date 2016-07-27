@@ -1,3 +1,8 @@
+#Change: Brands (line 12), working directory (line 4), drug (line 85)
+#Functions: getNewids
+#Drugs for Nathaniel: Thiazoladinediones , Sulfonylureas
+#Drugs for Corey: Insulin
+#Drugs for Guan-Wun: Metformin
 
 setwd("/Users/corey/Desktop/Data+/data")
 library(dplyr)
@@ -7,11 +12,9 @@ rx_w <- merge(rx, iri_week,by.x = "Week", by.y = "IRI.Week")
 rx_w$Start.Date <- rx_w$Start.Date %>% as.character() %>% as.Date(format = "%Y-%m-%d")
 rx_w$End.Date <- rx_w$End.Date %>% as.character() %>% as.Date(format = "%Y-%m-%d")
 
-brandsMet <- c("Fortamet", "Glucophage", "Glumetza", "Riomet", "Obimet",
-            "Dianben", "Diaformin", "Siofor", "Metfogamma", "Janumet",
-            "Kazano", "Invokamet", "Xigduo", "Synjardy", "Metaglip" ,
-            "Jentaduo" , "Actoplus", "Prandimet", "Avandamet", "Kombiglyze", 
-            "Glumetza", "Metformin")
+brandsMet <- c("Diabinese", "Glucotrol", "Micronase","Glynase", "Diabeta",
+               "Amaryl", "chlorpropamide", "glimepiride", "glipizide", "glyburide",
+               "tolazamide", "tolbutamide")
 
 panelids1 <- getNewIDs(brandsMet, rx = rx, new = F, HHSizes = c(1))
 BrandsMet <- panelids1$Brands[[1]]
@@ -31,21 +34,18 @@ for(i in 1:length(ids)){
 }
 
 rx_m <- merge(rx_m, rx_range, by = "new_id")
- 
-gibbs <- function(rx_m, id, a = 57, b = 3, iter= 100){
+
+
+monte_carlo<- function(rx_m, id, pt = .95, iter= 100){
   rx_id_master <- rx_m[rx_m$new_id == id, ]
   t <- as.list(rep(NA, iter))
-  b_n <- a_n <- rep(NA, iter)
-  a_n[1] <- a; b_n[1] <- b
-  pt <- rep(NA, iter)
-  pt[1] <- a/(a+b)
   for(i in 1:iter){
     print(i)
     rx_id <- rx_id_master
     rx_id$fill_day <- as.Date("3000-01-01", format <- "%Y-%m-%d")
-      for(k in 1:nrow(rx_id)){
-        rx_id$fill_day[k] <- sample(seq(rx_id$Start.Date[k], rx_id$End.Date[k], 1), 1)
-      }
+    for(k in 1:nrow(rx_id)){
+      rx_id$fill_day[k] <- sample(seq(rx_id$Start.Date[k], rx_id$End.Date[k], 1), 1)
+    }
     rx_take <- data.frame(day = seq(rx_id$min_day[1], rx_id$max_day[1], 1), supply = NA)
     rx_id$fill <- 1
     rx_id <- rx_id[ , c("fill", "RxDays", "fill_day", "New_Refill_Sample")]
@@ -65,80 +65,32 @@ gibbs <- function(rx_m, id, a = 57, b = 3, iter= 100){
     
     
     rx_take$supply[index[1]] <- rx_take$RxDays[index[1]]
-    take[index[1]] <- rbinom(1, 1, pt[i]) 
-  
+    take[index[1]] <- rbinom(1, 1, pt) 
+    
     for(j in index[-1]){
       rx_take$supply[j] <- rx_take$supply[j-1] + rx_take$RxDays[j] - take[j-1]
       if(rx_take$supply[j] > 0){
-        take[j] <- rbinom(1, 1, pt[i]) 
+        take[j] <- rbinom(1, 1, pt) 
       }else{ take[j] <- 0}
     }
     take <- data.frame(take, day = rx_take$day)
     colnames(take)[1] <- paste("take_", i, sep = "")
     t[[i]] <- take
-    n_have <- sum(rx_take$supply[index] > 0)
-    n_take <- sum(take[1])
-    a_n[i + 1] <-  a + n_take; b_n[i + 1] <- b + n_have - n_take
-    pt[i + 1 ] <- rbeta(1, a_n, b_n)
     print(i)
   }
   take_f <- Reduce(function(...) merge(...), t)
   take_f$mean_take <- rowMeans(take_f[-1])
-  to_return <- list(new_id = id, take_f = take_f, pt = pt, a_n = a_n, b_n = b_n)
+  to_return <- list(new_id = id, take_f = take_f, pt = pt)
   return(to_return)
 }
-
-
-gibbs4 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 1000, a = 54, b = 6)
-system.time(gibbs5 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 1000, a = 18, b = 2))
-system.time(gibbs3 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 1000, a = 1, b = 1))
-gibbs6 <- gibbs(rx_m = rx_m, id = rx_m$new_id[1], iter = 1000, a = 1, b = 1)
-
-pt1 <- gibbs1$pt # a = 57, b = 3
-pt2 <- gibbs2$pt # a = 19, b = 1
-pt3 <- gibbs3$pt # a = 1, b = 1
-pt4 <- gibbs4$pt #a = 54, b = 6
-pt5 <- gibbs5$pt #a = 18, b = 2
-pt6 <- gibbs6$pt # a = 1, b = 1, iter = 10000
-
-take_f <- gibbs5$take_f
-a_n <- gibbs_ex
-plot(mean_take ~ day, data = take_f)
-iter  <- 1:500
-iter2 <- 1:1000
-par(mfrow = c(3,1))
-plot(pt1 ~ iter2, pch = 20, cex = .5)
-plot(pt2 ~ iter2, pch = 20, cex = .5)
-plot(pt3 ~ iter2, pch = 20, cex = .5)
-
-mean(pt1)
-mean(pt4)
-mean(pt2)
-mean(pt5)
-mean(pt6)
-mean(pt3)
-
-mean_pt5 <- rep(NA, length(pt5))
-for(i in 1:length(pt5)){
-  mean_pt5[i] <- mean(pt5[1:i])
+drug = "sulf" # Change this for every drug
+for(i in 1:length(ids)){
+  id <- ids[i]
+  varname <- paste("mc", id, drug, sep = "_")
+  do <- paste(varname, "<- monte_carlo(rx_m, id, pt = .95, iter = 100)", sep = "")
+  eval(parse(text = do))
+  
+  do <- paste("save(", varname, ", file = '", varname, ".RData' )", sep = "")
+  eval(parse(text = do))
 }
-iter <- 1:length(mean_pt5)
-plot(mean_pt5 ~ iter)
-
-mean_pt3 <- rep(NA, length(pt3))
-for(i in 1:length(pt3)){
-  mean_pt3[i] <- mean(pt3[1:i])
-}
-iter <- 1:length(mean_pt3)
-plot(mean_pt3 ~ iter)
-
-plot(mean_take ~ day, data = gibbs1$take_f)
-plot(mean_take ~ day, data = gibbs2$take_f)
-plot(mean_take~ day, data = gibbs4$take_f)
-
-save(gibbs1,file =  "gibbs1.RData")
-save(gibbs2, file = "gibbs2.RData")
-save(gibbs3,file =  "gibbs3.RData")
-save(gibbs4,file =  "gibbs4.RData")
-save(gibbs5,file =  "gibbs5.RData")
-save(gibbs6, file =  "gibbs6.RData")
+  

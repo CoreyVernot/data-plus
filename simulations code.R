@@ -283,7 +283,7 @@ for(i in 1:n){
   
   print("-----> f_tests")
   fs <- list(ftest(bin_mod), ftest(sum_mod), ftest(multi_mod), ftest(mid_mod))
-  f_tests[i] <- fs
+  f_tests[[i]] <- fs
   print(i)
 }
 save(f_tests, file = "f_tests.RData")
@@ -291,3 +291,4 @@ save(f_tests, file = "f_tests.RData")
 #write.csv(BIC_all, "BIC_all.csv")
 #write.csv(anova_all, "anova_all.csv")
 
+a <- list(1,2,3)
