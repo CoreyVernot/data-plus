@@ -14,6 +14,35 @@ getRx(years = c(10,11,12), server = "SQLServer_IRI" )
     server
       Character string for name of ODBC server  
 
+findK0(rx, panelids, brands)
+  Description:
+    Find the start timeunit(4 weeks per timeunit) of prescription for each individual and returns a dataframe with 
+    the associated k values (number of timeunits before or after start of prescription) 
+  Arguments:
+    rx
+      Prescription data returned from getRx()
+    panelids
+      Numeric vector of individuals' ids
+    brands
+      Character vector of brand names for a generic drug
+  
+findJ0(rx, panelids, Medical_Condition, use_sample = F)
+  Description:
+    Find the start timeunit(4 weeks per timeunit) of prescription for each individual and returns a dataframe with
+    the associated j values (number of timeunits before or after start of prescription)
+  Arguments:
+    rx
+      Prescription data returned from getRx()
+    panelids
+      Numeric vector of individuals' ids
+    Medical_Condition
+      Character vector of medical conditions
+    use_sample
+      Should prescription data include samples and brands which are classified as other prescription/sample?
+  Miscellaneous:
+    The difference between findK0() and findJ0() is that the first function finds the start of prescription for a specific drug
+    while the second function finds the start of prescription for a medical condition, which contains one or more drugs.
+
 getPanelIDs(..., rx, demo, static_panel = T, HHSizes=1, Medical_Condition = NA, new = T, only_first_rx = F, use_sample = F)
   Description:
     Find set(s) of individuals that use prescription brands associated with specific drug(s).
@@ -92,4 +121,18 @@ getTrans(ShowFoodOptions = FALSE, ShowNutrientOptions = FALSE, ShowYearOptions =
     iri_server
       Character string for name of ODBC server which consists of transaction information in retail stores
 
+timeunitKey()
+  Description:
+    Creates a dataframe for dates and the corresponding timeunit pairs
 
+cleanData(trans, rx, brands)
+  Description:
+    Clean transaction data, summarize each nutrition based on individual and timeunit, calculate all aggregated nutritions 
+    per total calories, and return as a dataframe
+  Arguments:
+    trans
+      Transaction data returned from getTrans()
+    rx
+      PreScription data returned from getRx()
+    brands
+      Character vector of brand names for a generic drug
