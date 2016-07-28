@@ -1,0 +1,23 @@
+middle_model(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-1, 3), time_ref = "-1")
+  Description:
+    Takes cleaned transaction data and runs a fixed effects model to estimate change in a nutrient consumption around prescription start date. 
+    Estimates effects of 3 variables related to the start date:
+      1) Timeunit is within the k_range for the individual
+      2) Timeunit is before the k_range for the individual
+      3) Timeunit is after the k_range for the individual
+  Arguments:
+    data:
+      Cleaned transaction data returned by cleanData()
+    nutrient:
+      Nutrient to be used as dependent variable in model
+    calorie_cut_points:
+      Range of plausible calories/day. Household/timeunit observations with calorie consumption/day outside this range are trimmed.
+    k_range:
+      range of timeunits around the start of the prescription start date (k = 0) to test as a group.
+    time_ref:
+      A string that can take values "-1", "0", "1" that identifies the k group category to be left out in regression. "0" is the k group around the Rx start date.
+
+sum_model_new(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-6, 6), k_ref = "0")
+  Description:
+    Takes cleaned transaction data and runs a fixed effects model estimate change in a nutrient consumption around prescription start date.
+    Estimates one fixed effect for every value of k within the k range. 
