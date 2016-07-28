@@ -3,7 +3,7 @@ getDemo(server)
     Connects to a database and returns the demographic data
   Arguments:
     server
-      Character string for name of OBDC server  
+      Character string for name of ODBC server  
 
 getRx(years = c(10,11,12), server = "SQLServer_IRI" )
   Description:
@@ -12,7 +12,7 @@ getRx(years = c(10,11,12), server = "SQLServer_IRI" )
     years
       Integer vector refering to the years (without century) to draw from the database
     server
-      Character string for name of OBDC server  
+      Character string for name of ODBC server  
 
 getPanelIDs(..., rx, demo, static_panel = T, HHSizes=1, Medical_Condition = NA, new = T, only_first_rx = F, use_sample = F)
   Description:
@@ -28,8 +28,68 @@ getPanelIDs(..., rx, demo, static_panel = T, HHSizes=1, Medical_Condition = NA, 
       Should only individuals in the static panel be used?
     HHSizes
       Integer vector of length > 0 referring to the allowable household sizes
+    Medical_Condition
+      No specification by default, or else a character vector of medical conditions
+    new
+      Should only include individuals who started their new presciptions within the study period? 
+    only_first_rx
+      Should only individuals who started their first prescription within the study period be included?
+    use_sample
+      Should prescription data include samples and brands which are classified as other prescription/sample?
     
-  
+getFoodList()
+  Description:
+    Returns a list of food categories and the corresponding category descriptions
 
+getNut(server = "SQLServer_BECR", nutrition)
+  Description:
+    Connects to a database and returns a dataframe of serving sizes and nutrients for each upc
+  Arguments:
+    server
+      Character string for name of ODBC server
+    nutrition
+      Character vector consisting of one or more nutritions
+
+getFood(server = "SQLServer_IRI", data, panelIDs)
+  Description:
+    Connects to a database and returns a dataframe of transactions dates, upc, food categories, ounces and fluid ounces
+    for each individual
+  Arguments:
+    server
+      Character string for name of ODBC server
+    data
+      Character vector of the names of data within the database
+    panelIDs
+      Numeric vector of individuals' ids
+
+getTrans(ShowFoodOptions = FALSE, ShowNutrientOptions = FALSE, ShowYearOptions = FALSE, 
+         FoodType = c("BAK_DES","BEV","BFAST_DAIRY","BFLS","CANDY","CSB","FR_MEAL","FVM","RW","SNACKS","SS_MEAL"),
+         Nutrition = c("calories", "cholesterol", "fiber", "protein", "sat_fat", "sodium", "sugars", "tot_carb", "tot_fat"),
+         PanelIDs = NA, Year = c(8,9,10,11,12), becr_server = "SQLServer_BECR", iri_server = "SQLServer_IRI")
+  Description:
+    Connects to two databases, merges getNut() and getFood(), and returns a dataframe of nutritions, transaction dates, upc, 
+    food categories, serving sizes, ounces, and fluid ounces for each individual.
+  Arguments:
+    ShowFoodOptions
+      User friendly options of whether to choose food categories. 
+      If TRUE, choose food categories interactively in console panel from getFoodList(); otherwise, all food categories in FoodType
+      argument are included.
+    ShowNutrientOptions
+      User friendly options of whether to choose nutrients.
+      If TRUE, choose nutritions interactively in console panel from the given nutrition list; otherwise, all nutritions in Nutrition
+      argument are included.
+    ShowYearOptions
+      User friendly options of whether to choose years.
+      If TRUE, choose years (without centuries) in console panel from the given year list; otherwise, all years in Year argument are included.
+    FoodType
+      Character vector of all food categories in getFoodList()
+    Nutrition
+      Character vector of all nutritions in the database
+    PanelIDs
+      Numeric vector of individuals' ids from getPanelIDs()
+    becr_server
+      Character string for name of ODBC server which consists of nutrition information
+    iri_server
+      Character string for name of ODBC server which consists of transaction information in retail stores
 
 
