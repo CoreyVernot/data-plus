@@ -1,0 +1,35 @@
+getDemo(server)
+  Description:
+    Connects to a database and returns the demographic data
+  Arguments:
+    server
+      Character string for name of OBDC server  
+
+getRx(years = c(10,11,12), server = "SQLServer_IRI" )
+  Description:
+    Connects to a database and returns the prescription drug data for a specified set of years (2010, 2011, 2012)
+  Arguments:
+    years
+      Integer vector refering to the years (without century) to draw from the database
+    server
+            Character string for name of OBDC server  
+
+getPanelIDs(..., rx, demo, static_panel = T, HHSizes=1, Medical_Condition = NA, new = T, only_first_rx = F, use_sample = F)
+  Description:
+    Find set(s) of individuals that use prescription brands associated with specific drug(s).
+  Arguments:
+    ...
+      One or more character vectors referring to common names of sets of drugs. Each vector refers to a separate drug and returns a separate sample.
+    rx
+      Prescription data returned from getRx()
+    demo
+      Demographic data returned from getDemo()
+    static_panel
+      Should only individuals in the static panel be used?
+    HHSizes
+      Integer vector of length > 0 referring to the allowable household sizes
+    
+  
+
+
+
