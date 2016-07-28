@@ -1,0 +1,31 @@
+findJ0
+
+
+
+Description:
+
+This function returns a 2-column data frame of an ID and the first timeunit the ID was recorded purchasing any prescriptions for a specified medical condition. In a way, it is a more general version of findK0(). It requires a week to timeunit (4-week period) conversion chart to be in the working directory. This is only used within the getPanelIDs() function, and only if only_first_rx is TRUE. This function is run once for each entry in the ellipse argument.
+
+
+
+Usage
+
+findJ0(rx, panelids, Medical_Condition, use_sample = F)
+
+
+
+Arguments:
+
+rx -- a prescription data frame.
+
+panelids -- the panelIDs that match the conditions from the arguments to getPanelIDs().
+
+Medical_Condition -- a character of medical conditions by which the prescription purchases will be subset.
+
+use_sample -- a logical indicating whether to include prescription "samples" (in addition to "new" prescriptions and "refills").
+
+
+
+Value:
+
+This returns a data frame. The first column consists of IDs and the second consists of the first timeunit we see the ID obtain any prescription a specified medical condition.

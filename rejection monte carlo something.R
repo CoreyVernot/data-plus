@@ -1,7 +1,8 @@
 
 github <- "C:\\Users\\Nathaniel Brown\\Documents\\GitHub\\data-plus\\"
 box <- "C:\\Users\\Nathaniel Brown\\workspace\\BECR\\"
-
+setwd(box)
+load_me <- paste(box,".RData",sep="")
 
 #Rejection sampling illustration
 

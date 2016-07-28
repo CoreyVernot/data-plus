@@ -1,0 +1,54 @@
+getPanelIDs
+
+
+
+Description:
+
+This function returns a list that includes which of the specified brands were found in the prescription data, and which IDs are using that brand.
+
+
+
+Usage:
+
+getPanelIDs(..., rx, demo, static_panel = T, HHSizes=1, Medical_Condition = NA, new = T, only_first_rx = F, use_sample = F)
+
+
+
+Arguments:
+
+... -- an unspecified number of drug brands in the form of character vectors.
+
+rx -- the prescription data frame from getRx().
+
+demo -- the demographic data frame from getDemo().
+
+static_panel -- a logical indicating if the IDs not deemed reliable will be filtered out of the returned IDs.
+
+HHSizes -- a numeric indicating by which household size values the panelIDs should be subset.
+
+Medical_Condition -- a character of medical conditions by which you can subset the returned IDs (cannot be NA if only_first_rx is TRUE).
+
+new -- a logical indicating if the IDs that did not begin a new prescription of the specified brands will be filtered out.
+
+only_first_rx -- a logical indicating if the IDs that did not begin a new prescription of any brand for specified medical conditions will be filtered out
+
+use_sample -- a logical indicating whether to include prescription "samples" (in addition to "new" prescriptions and "refills"). Only evaluated if only_first_rx is TRUE
+
+
+
+Value:
+This function returns a list of lists. The first index is "IDs" and the second one is "Brands". Within "IDs", there is a list of numeric PanelIDs, where each index of the list corresponds to the index of the ellipse argument. Within "Brands", there is a list of character brand names that matched within the rx data frame, also corresponding to the index of the ellipse.
+
+
+
+Examples:
+
+r <- getRx()
+d <- getDemo
+oxycodone <- c("OxyContin", "Roxicodone", "Oxecta")
+morphine <- c("Astramorph PF", "AVINZA", "Duramorph", "Kadian", "M S Contin", "MSIR", "Oramorph SR", "Rescudose", "Roxanol")
+id_list <- getPanelIDs(oxycodone, morphine, rx = r, demo = d)
+oxy_ids <- id_list[["IDs"]][[1]]
+oxy_brands <- id_list[["Brands"]][[1]]
+morph_ids <- id_list[["IDs"]][[2]]
+morph_brands <- id_list[["Brands"]][[2]]

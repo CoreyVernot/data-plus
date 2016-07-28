@@ -1,0 +1,33 @@
+getRx
+
+
+
+Description:
+
+Retreives prescription data from the server; assumes the format of a file name is "Rx10" for prescription information in the year 2010.
+
+
+
+Usage:
+
+getRx(years = c(10,11,12), server = "SQLServer_IRI")
+
+
+
+Arguments:
+
+years -- a numeric of the last two digits of the year. A data frame with observations from all of the specified years is returned.
+
+server -- a character of the name of the server where the prescription data can be found.
+
+
+
+Value:
+
+A data frame of all the observations for each specified year is returned.
+
+
+
+Examples:
+
+rx12 <- getRx(years = 12, server = "My_Server")

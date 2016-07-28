@@ -16,18 +16,20 @@ getDemo <- function(server = "SQLServer_IRI"){
 }
 
 findK0 <- function(rx, panelids, brands){
-  IRI_week <- read.csv("IRI_week.csv")
+  IRI_week <- read.csv("IRI_week.csv") #table that converts weeks to timeunits (periods of 4 weeks)
   rx2 <- rx[rx$panelid %in% panelids, ]
   rx2 <- rx2[rx2$Rx_Brand %in% brands, ]
   rx2 <- rx2[rx2$New_Refill_Sample == "New",]
-  k_table <- rx2 %>% group_by(panelid) %>% summarize(IRI.Week = min(Week))
+  k_table <- rx2 %>% group_by(panelid) %>% summarize(IRI.Week = min(Week)) 
   k_table <- merge(k_table, IRI_week, by = "IRI.Week", all.x = T)
+  #the first timeunit in which an individual appears with a new prescription in the brands character vector
+
   colnames(k_table)[colnames(k_table) == "timeunit"] <- "k_zero_timeunit"
   k_table <- k_table[, c("panelid", "k_zero_timeunit")]
   return(k_table)
 }
 
-findJ0 <- function(rx, panelids, Medical_Condition, use_sample = F){ #J_zero is the first timeunit where the patient recieved a perscription for diabetes
+findJ0 <- function(rx, panelids, Medical_Condition, use_sample = F){
   IRI_week <- read.csv("IRI_week.csv")
   rx2 <- rx[rx$panelid %in% panelids, ]
   rx2 <- rx2[rx2$Medical_Condition %in% Medical_Condition, ]
@@ -37,6 +39,7 @@ findJ0 <- function(rx, panelids, Medical_Condition, use_sample = F){ #J_zero is 
   }
   j_table <- rx2 %>% group_by(panelid) %>% summarize(IRI.Week = min(Week))
   j_table <- merge(j_table, IRI_week, by = "IRI.Week", all.x = T)
+  #J_zero is the first timeunit where the patient recieved ANY prescription brand for a specified medical condition
   colnames(j_table)[colnames(j_table) == "timeunit"] <- "j_zero_timeunit"
   j_table <- j_table[, c("panelid", "j_zero_timeunit")]
   return(j_table)
