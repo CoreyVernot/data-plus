@@ -12,7 +12,7 @@ getRx(years = c(10,11,12), server = "SQLServer_IRI" )
     years
       Integer vector refering to the years (without century) to draw from the database
     server
-            Character string for name of OBDC server  
+      Character string for name of OBDC server  
 
 getPanelIDs(..., rx, demo, static_panel = T, HHSizes=1, Medical_Condition = NA, new = T, only_first_rx = F, use_sample = F)
   Description:
