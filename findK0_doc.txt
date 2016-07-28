@@ -1,0 +1,29 @@
+findK0
+
+
+
+Description:
+
+This function returns a 2-column data frame of an ID and the first timeunit the ID was recorded purchasing any prescriptions within specified brands. It requires a week to timeunit (4-week period) conversion chart to be in the working directory. This is only used within the getPanelIDs() function, and only if only_first_rx is TRUE. This function is run once for each entry in the ellipse argument.
+
+
+
+Usage:
+
+findK0(rx, panelids, brands)
+
+
+
+Arguments:
+
+rx -- a prescription data frame.
+
+panelids -- the panelIDs that match the conditions from the arguments to getPanelIDs().
+
+brands -- a character of brand names; from the ellipse argument to getPanlIDs().
+
+
+
+Value:
+
+This returns a data frame. The first column consists of IDs and the second consists of the first timeunit we see the ID obtain prescription for the specified brands.

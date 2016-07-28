@@ -1,0 +1,24 @@
+getDemo
+
+
+
+Description:
+
+Retrieves demographic information from the specified server. Assumes the name of the file is "DEMO"
+
+
+
+Usage:
+
+getDemo(server = "SQLServer_IRI")
+
+
+
+Arguments:
+
+server -- a character of the name of the server where the demographic data can be found.
+
+
+
+Value:
+A data frame of the full demographic information is returned.
