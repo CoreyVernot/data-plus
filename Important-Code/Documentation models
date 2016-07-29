@@ -1,3 +1,5 @@
+Important Detail: k is defined as the number of timeunits after the start of a prescription. k is negative before rx start date, 0 during starting timeunit, and positive after
+
 middle_model(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-1, 3), time_ref = "-1")
   Description:
     Takes cleaned transaction data and runs a fixed effects model to estimate change in a nutrient consumption around prescription start date. 
@@ -5,6 +7,7 @@ middle_model(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_r
       1) Timeunit is within the k_range for the individual
       2) Timeunit is before the k_range for the individual
       3) Timeunit is after the k_range for the individual
+  
   Arguments:
     data:
       Cleaned transaction data returned by cleanData()
@@ -15,9 +18,22 @@ middle_model(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_r
     k_range:
       range of timeunits around the start of the prescription start date (k = 0) to test as a group.
     time_ref:
-      A string that can take values "-1", "0", "1" that identifies the k group category to be left out in regression. "0" is the k group around the Rx start date.
+      A string that can take values "-1", "0", "1" that identifies the k group category to be left out in regression. "0" is the k group around the Rx start date, "-1" and "1" are before and after.
 
 sum_model_new(data, nutrient = "calories", calorie_cut_points = c(800, 7000), k_range =c(-6, 6), k_ref = "0")
   Description:
-    Takes cleaned transaction data and runs a fixed effects model estimate change in a nutrient consumption around prescription start date.
-    Estimates one fixed effect for every value of k within the k range. 
+    Takes cleaned transaction data and runs a fixed effects model to estimate change in a nutrient consumption around prescription start date.
+    Estimates one fixed effect for every value of k within the k range. A total of (k_range[2] - k_range[1] + 2) coefficients are estimated related to the prescription start dater 
+  Arguments:
+    data:
+      Cleaned transaction data returned by cleanData()
+    nutrient:
+      Nutrient to be used as dependent variable in model
+    calorie_cut_points:
+      Range of plausible calories/day. Household/timeunit observations with calorie consumption/day outside this range are trimmed.
+    k_range:
+      range of timeunits around the start of the prescription start date (k = 0) to be given individual fixed effects. K's before / after these are lumped in to 1 of either "bmin" (before range) or "bmax" (after range)
+    k_ref:
+      A string that can take one value in c(as.character(k_range), "bmin", "bmax") that identifies the k group category to be left out in regression.
+ 
+  
