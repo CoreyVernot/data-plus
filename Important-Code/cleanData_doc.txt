@@ -1,0 +1,11 @@
+cleanData(trans, rx, brands)
+  Description:
+    Clean transaction data, summarize each nutrition based on individual and timeunit, calculate all aggregated nutritions 
+    per total calories, and return as a dataframe
+  Arguments:
+    trans
+      Transaction data returned from getTrans()
+    rx
+      PreScription data returned from getRx()
+    brands
+      Character vector of brand names for a generic drug
