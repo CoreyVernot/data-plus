@@ -69,6 +69,8 @@ getPanelIDs(..., rx, demo, static_panel = T, HHSizes=1, Medical_Condition = NA, 
 getFoodList()
   Description:
     Returns a list of food categories and the corresponding category descriptions
+  Miscellaneous:
+    helper function of getTrans()
 
 getNut(server = "SQLServer_BECR", nutrition)
   Description:
@@ -78,6 +80,8 @@ getNut(server = "SQLServer_BECR", nutrition)
       Character string for name of ODBC server
     nutrition
       Character vector consisting of one or more nutritions
+  Miscellaneous:
+    helper function of getTrans()
 
 getFood(server = "SQLServer_IRI", data, panelIDs)
   Description:
@@ -90,6 +94,8 @@ getFood(server = "SQLServer_IRI", data, panelIDs)
       Character vector of the names of data within the database
     panelIDs
       Numeric vector of individuals' ids
+  Miscellaneous:
+    helper function of getTrans()
 
 getTrans(ShowFoodOptions = FALSE, ShowNutrientOptions = FALSE, ShowYearOptions = FALSE, 
          FoodType = c("BAK_DES","BEV","BFAST_DAIRY","BFLS","CANDY","CSB","FR_MEAL","FVM","RW","SNACKS","SS_MEAL"),
@@ -120,10 +126,25 @@ getTrans(ShowFoodOptions = FALSE, ShowNutrientOptions = FALSE, ShowYearOptions =
       Character string for name of ODBC server which consists of nutrition information
     iri_server
       Character string for name of ODBC server which consists of transaction information in retail stores
+  Examples:
+    #get rx and demo from getRx() and getDemo()
+    rx <- getRx()
+    demo <- getDemo()
+    #get individuals' ids from getPanelIDs()
+    B11 <- "Metformin"
+    B21 <- "ALLOPURINOL"; B22 <- "COSOPT"
+    D1 <- c(B11)
+    D2 <- c(B21,B22)
+    panelids <- getPanelIDs(D1,D2, rx=rx, demo=demo, HHSize = 1)
+    #plug panelids in getTrans()
+    transT <- getTrans(ShowFoodOptions = T,ShowNutrientOptions = T,ShowYearOptions = T,PanelIDs = panelids[["IDs"]][[1]])
+    transF <- getTrans(FoodType = c("BFLS","SNACKS"), Nutrition = c("calories","cholesterol"), Year = 9:12, PanelIDs = panelids[["IDs"]][[2]])
 
 timeunitKey()
   Description:
     Creates a dataframe for dates and the corresponding timeunit pairs
+  Miscellaneous:
+    helper function of cleanData()
 
 cleanData(trans, rx, brands)
   Description:
