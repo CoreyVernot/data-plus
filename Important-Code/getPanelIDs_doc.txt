@@ -44,7 +44,7 @@ This function returns a list of lists. The first index is "IDs" and the second o
 Examples:
 
 r <- getRx()
-d <- getDemo
+d <- getDemo()
 oxycodone <- c("OxyContin", "Roxicodone", "Oxecta")
 morphine <- c("Astramorph PF", "AVINZA", "Duramorph", "Kadian", "M S Contin", "MSIR", "Oramorph SR", "Rescudose", "Roxanol")
 id_list <- getPanelIDs(oxycodone, morphine, rx = r, demo = d)
