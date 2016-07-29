@@ -4,7 +4,7 @@ getTrans <- function(ShowFoodOptions = FALSE,
                      AllIDs = FALSE,
                      FoodType = c("BAK_DES","BEV","BFAST_DAIRY","BFLS","CANDY","CSB","FR_MEAL","FVM","RW","SNACKS","SS_MEAL"),
                      Nutrition = c("calories", "cholesterol", "fiber", "protein", "sat_fat", "sodium", "sugars", "tot_carb", "tot_fat"),
-                     PanelIDs = NA,
+                     PanelIDs = NA, #a numeric vector
                      Year = c(8,9,10,11,12),
                      becr_server = "SQLServer_BECR",
                      iri_server = "SQLServer_IRI"){
@@ -31,7 +31,7 @@ getTrans <- function(ShowFoodOptions = FALSE,
     year <- Year
   }
   
-  
+  #making the variable foodyear (which corresponds to names of the food datasets)
   year <- as.character(year)
   year[nchar(year) < 2] <- paste("0", year[nchar(year) < 2], sep = "")
   foodyear <- rep(NA, length(year)*length(food))
@@ -44,6 +44,7 @@ getTrans <- function(ShowFoodOptions = FALSE,
   nut <- getNut(becr_server = becr_server, nutrition = nutrition)
   food <- getFood(server = iri_server, data = foodyear, PanelIDs = PanelIDs)
   trans <- merge(nut, food, by = "upc")
+  #each panelid appears once for each purchase, along with nutrition information from that purchase
   return(trans)
 }
 
