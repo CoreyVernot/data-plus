@@ -1,0 +1,5 @@
+getFoodList()
+  Description:
+    Returns a list of food categories and the corresponding category descriptions
+  Miscellaneous:
+    helper function of getTrans()
