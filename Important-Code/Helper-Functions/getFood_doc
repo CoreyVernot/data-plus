@@ -1,0 +1,13 @@
+getFood(server = "SQLServer_IRI", data, panelIDs)
+  Description:
+    Connects to a database and returns a dataframe of transactions dates, upc, food categories, ounces and fluid ounces
+    for each individual
+  Arguments:
+    server
+      Character string for name of ODBC server
+    data
+      Character vector of the names of data within the database
+    panelIDs
+      Numeric vector of individuals' ids
+  Miscellaneous:
+    helper function of getTrans()
