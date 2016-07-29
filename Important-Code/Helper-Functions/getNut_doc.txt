@@ -1,0 +1,10 @@
+getNut(server = "SQLServer_BECR", nutrition)
+  Description:
+    Connects to a database and returns a dataframe of serving sizes and nutrients for each upc
+  Arguments:
+    server
+      Character string for name of ODBC server
+    nutrition
+      Character vector consisting of one or more nutritions
+  Miscellaneous:
+    helper function of getTrans()
