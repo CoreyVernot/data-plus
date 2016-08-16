@@ -1,0 +1,36 @@
+getTrans
+
+
+
+Description:
+
+This function retrieves the individual purchase information from the database. For specified food categories, nutrients, years, and panelids.
+
+
+Arguments:
+
+ShowFoodOptions -- select the options for from a list instead of typing the full names out.   
+
+ShowNutrientOptions -- select the nutrients from a list instead of typing the full names out,
+                     
+ShowYearOptions -- select the years from a list instead of typing the numbers out
+                     
+AllIDs -- a logical value indicating if the food purchase information should be subset by PanelIDs.
+
+FoodType -- a character vector of food options. NULL if ShowFoodOptions is TRUE
+
+Nutrition -- a character vector of nutrients. NULL if ShowNutrientOptions is TRUE
+
+PanelIDs -- a numeric vector of PanelIDs to subset the data by
+
+Year -- a numeric vector of years (last two digits only) to subset the data by. NULL if ShowYearOptions is TRUE.
+
+becr_server -- the server name where the serving size data is found
+
+iri_server -- the server name where the food purchase data is found
+
+
+
+Value:
+
+A data frame of all purchase information by PanelID

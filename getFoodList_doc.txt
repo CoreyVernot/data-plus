@@ -1,0 +1,25 @@
+getFoodList
+
+
+
+Description:
+
+This function is a helper function used in getTrans(). It is used for selecting tables from the database if the ShowFoodOptions argument is TRUE.
+
+
+
+Usage:
+
+foodlist <- getFoodList()
+
+
+
+Arguments:
+
+NA
+
+
+
+Value:
+
+This returns a list that acts as a translator between the database's food grouping terminology and it's meaning in english. For example, at the index of "Condiments, Sauces, and Baking Ingredients" the value "CSB".
