@@ -1,0 +1,28 @@
+getNut
+
+
+
+Description:
+
+This function is a helper function used in getTrans(). The returned value of getNut() is a dataframe with a "upc" column (a unique value given to every type of food that barcode scanners use) and a "nfp_serv_size_us" column that just denotes the serving size of the particular upc item. The result of this function is merged with the result of getFood() and returned in getTrans()
+
+
+
+
+Usage:
+
+nut <- getNut(becr_server = "SQLServer_BECR", nutrition = c("calories","cholesterol")
+
+
+
+Arguments:
+
+becr_server -- the server name where the food purchase data can be found
+
+nutrition -- the nutrition categories for which you want data returned (calories, carbohydrates, sugar, etc.)
+
+
+
+Value:
+
+A data frame of serving size data by upc

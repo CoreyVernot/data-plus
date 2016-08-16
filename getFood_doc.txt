@@ -1,0 +1,30 @@
+getFood
+
+
+
+Description:
+  
+  This function is a helper function used in getTrans(). The returned value of getFood() is a dataframe with the columns: panelid, purdate (purchase date), purdate2, purmo, puryr, upc, category, oz, totoz, floz, totfloz. The result of this function is merged with the result of getNut() and returned in getTrans()
+
+
+
+
+Usage:
+  
+  food <- getFood(server = iri_server, data = foodyear, PanelIDs = PanelIDs)
+
+                
+                
+Arguments:
+                  
+  server -- the server name where the food purchase data can be found
+                
+  data -- a character vector of the names of the datasets you want to get the informationfrom. This assumes the datasets are named "CSB10" for the food group "Condiments, Sauces, and Baking Ingredients" in the year 2010.
+                
+  PanelIDs -- the PanelIDs for which you want to obtain the information. This can be used to subset by certain prescriptions, or to create a control group.           
+                
+                
+                
+Value:
+                  
+  A data frame of individual purchases by PanelID.
